@@ -826,8 +826,8 @@
   height: 15vh;
   background: linear-gradient(to bottom, 
     transparent 0%, 
-    rgba(238, 243, 255, 0.7) 50%, 
-    #eef3ff 100%
+    rgba(224, 231, 239, 0.7) 50%, 
+    #E0E7EF 100%
   );
   z-index: 2;
   pointer-events: none;
@@ -911,6 +911,38 @@
 }
 
 /* ---------- nadella (page 6) ---------- */
+.figma-nadella {
+  position: relative;
+}
+
+/* 6-7페이지 심리스 브릿지 (하단) */
+.figma-nadella::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18vh;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(224, 231, 239, 0.4) 40%, 
+    rgba(247, 249, 255, 0.8) 80%, 
+    #f7f9ff 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10;
+  pointer-events: none;
+  transition: all 0.8s ease;
+  opacity: 1;
+}
+
+.figma-nadella.on::after {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
+}
+
 .figma-nadella__meta {
   max-width: 42em;
 }
@@ -937,6 +969,35 @@
 /* ---------- capital (page 7) ---------- */
 .figma-capital {
   background: #f7f9ff;
+  position: relative;
+}
+
+/* 6-7페이지 심리스 브릿지 (상단) */
+.figma-capital::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18vh;
+  background: linear-gradient(to bottom, 
+    #E0E7EF 0%, 
+    rgba(224, 231, 239, 0.8) 20%, 
+    rgba(247, 249, 255, 0.4) 60%, 
+    transparent 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10;
+  pointer-events: none;
+  transition: all 0.8s ease;
+  opacity: 1;
+}
+
+.figma-capital.on::before {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
 }
 
 .figma-capital__main-area {
@@ -946,6 +1007,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* 7-8페이지 심리스 브릿지 (하단) */
+.figma-capital::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18vh;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(247, 249, 255, 0.4) 40%, 
+    rgba(238, 243, 255, 0.8) 80%, 
+    #eef3ff 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10;
+  pointer-events: none;
+  transition: all 0.8s ease;
+  opacity: 1;
+}
+
+.figma-capital.on::after {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
 }
 
 .figma-capital__diagram-wrapper {
@@ -1168,6 +1257,34 @@
 .figma-risk {
   background: #eef3ff;
   position: relative;
+}
+
+/* 7-8페이지 심리스 브릿지 (상단) */
+.figma-risk::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18vh;
+  background: linear-gradient(to bottom, 
+    #f7f9ff 0%, 
+    rgba(247, 249, 255, 0.8) 20%, 
+    rgba(238, 243, 255, 0.4) 60%, 
+    transparent 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10;
+  pointer-events: none;
+  transition: all 0.8s ease;
+  opacity: 1;
+}
+
+.figma-risk.on::before {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
 }
 
 /* Ensure risk slide content never disappears due to generic .rv animations */
@@ -3979,7 +4096,7 @@ body.on-figma #hint::after {
   background: linear-gradient(to bottom, 
     transparent 0%, 
     rgba(247, 249, 255, 0.7) 50%, 
-    #f7f9ff 100%
+    #E0E7EF 100%
   );
   z-index: 2;
   pointer-events: none;
