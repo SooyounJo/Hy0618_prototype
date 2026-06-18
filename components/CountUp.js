@@ -10,7 +10,8 @@ export default function CountUp({
   startWhen = true,
   separator = "",
   onStart,
-  onEnd
+  onEnd,
+  format
 }) {
   const ref = useRef(null);
   const frameRef = useRef(null);
@@ -35,6 +36,10 @@ export default function CountUp({
 
   const formatValue = useCallback(
     (latest) => {
+      if (typeof format === "function") {
+        return format(latest);
+      }
+
       const hasDecimals = maxDecimals > 0;
 
       const options = {
@@ -47,7 +52,7 @@ export default function CountUp({
 
       return separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
     },
-    [maxDecimals, separator]
+    [maxDecimals, separator, format]
   );
 
   // 기본 값 설정

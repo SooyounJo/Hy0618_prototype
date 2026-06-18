@@ -1,19 +1,16 @@
-import DarkVeil from "../DarkVeil";
+import Silk from "../Silk";
 
 export default function SlideNadella() {
   return (
     <section className="slide figma-slide figma-nadella figma-silk" data-ch="2" data-title="나델라의 메시지">
       <div className="figma-silk__bg" aria-hidden="true">
-        <DarkVeil
-          color1="#D6E2FF"
-          color2="#92A9ED"
-          color3="#4D6DFF"
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={1.2}
-          scanlineFrequency={0}
-          warpAmount={0.2}
-          resolutionScale={1.0}
+        <Silk
+          speed={4.5}
+          scale={0.4}
+          color="#6690FF"
+          color2="#E0E7EF"
+          noiseIntensity={0.4}
+          rotation={0.12}
         />
       </div>
 

@@ -79,9 +79,9 @@ export default function SlideCover() {
     >
       <div className="figma-cover__bg" aria-hidden="true">
         <Grainient
-          color1="#7fa4ff"
+          color1="#6d8fff"
           color2="#001b3d"
-          color3="#c7d6ff"
+          color3="#dbe7ff"
           timeSpeed={0.5}
           colorBalance={0.0}
           warpStrength={2.8}

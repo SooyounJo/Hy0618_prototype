@@ -77,7 +77,11 @@ export default function SlideAnnexValueChain() {
           <button
             type="button"
             className={`figma-annex-vc__direction-btn${isReversed ? " is-on" : ""}`}
-            onClick={() => setIsReversed((prev) => !prev)}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setIsReversed((prev) => !prev);
+            }}
           >
             {isReversed ? "다시 단방향으로" : "방향을 뒤집다"}
           </button>

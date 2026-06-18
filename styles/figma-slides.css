@@ -414,8 +414,9 @@
 
 /* ---------- silk background (ford / nadella) ---------- */
 .figma-silk {
-  background: #eef3ff;
+  background: #E0E7EF;
   text-align: center;
+  position: relative;
 }
 
 .figma-silk__bg {
@@ -425,30 +426,12 @@
   pointer-events: none;
 }
 
-.figma-silk__glow {
-  position: absolute;
-  inset: -8%;
-}
-
-.figma-silk__glow--a {
-  background:
-    radial-gradient(80% 70% at 50% 100%, rgba(255, 255, 255, 0.9) 0%, rgba(151, 188, 255, 0.5) 35%, rgba(73, 137, 255, 0.35) 55%, rgba(182, 194, 255, 0.15) 100%),
-    linear-gradient(180deg, #f8fbff 0%, #c8d8ff 100%);
-  opacity: 0.55;
-}
-
-.figma-silk__glow--b {
-  background:
-    radial-gradient(50% 40% at 100% 50%, rgba(77, 109, 255, 0.4), transparent 70%),
-    radial-gradient(45% 38% at 0% 50%, rgba(77, 109, 255, 0.32), transparent 68%);
-  filter: blur(14px);
-  opacity: 0.66;
-}
+/* 기존 정적 글로우 레이어 제거 (Silk 배경으로 대체) */
 
 /* ---------- ford (page 3) ---------- */
 .figma-ford {
   position: relative;
-  background: #000; /* 베일이 잘 보이도록 블랙 배경 */
+  background: #000; /* ford slide keeps deep background */
 }
 
 /* 3-4페이지 심리스 브릿지 (하단) */
@@ -458,10 +441,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 15vh;
+  height: 8vh;
   background: linear-gradient(to bottom, 
-    transparent 0%, 
-    rgba(238, 243, 255, 0.7) 50%, 
+    transparent 0%,
+    rgba(238, 243, 255, 0.65) 55%,
     #eef3ff 100%
   );
   z-index: 1;
@@ -522,13 +505,7 @@
 }
 
 .figma-ford__quote-em {
-  color: inherit;
-  transition: color 0.8s ease;
-  transition-delay: 1.8s;
-}
-
-.slide.on .figma-ford__quote-em {
-  color: #4d6dff;
+  color: #000;
 }
 
 .figma-ford__who {
@@ -966,9 +943,16 @@
   position: relative;
   width: 100%;
   margin-top: clamp(20px, 3vh, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .figma-capital__diagram-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -1066,6 +1050,8 @@
   width: 100%;
   max-width: 980px;
   margin-top: clamp(28px, 4vh, 48px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .figma-capital__card {
@@ -1117,11 +1103,16 @@
 
 .figma-capital__arrow {
   margin-top: clamp(16px, 2vh, 24px);
+  display: flex;
+  justify-content: center;
 }
 
 .figma-capital__footnote {
   margin-top: clamp(12px, 2vh, 20px);
   max-width: 58em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 .figma-capital__footnote p {
@@ -1176,6 +1167,14 @@
 /* ---------- risk (page 8) ---------- */
 .figma-risk {
   background: #eef3ff;
+  position: relative;
+}
+
+/* Ensure risk slide content never disappears due to generic .rv animations */
+.figma-risk .rv {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
 }
 
 .figma-risk__bg {
@@ -1200,6 +1199,24 @@
     radial-gradient(45% 38% at 0% 50%, rgba(77, 109, 255, 0.28), transparent 68%);
   filter: blur(14px);
   opacity: 0.66;
+}
+
+/* 8-9페이지 심리스 브릿지 (하단) */
+.figma-risk::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15vh;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(238, 243, 255, 0.7) 50%,
+    #f7f9ff 100%
+  );
+  z-index: 2;
+  pointer-events: none;
 }
 
 .figma-risk__content {
@@ -1380,6 +1397,7 @@
 /* ---------- judgment (page 9) ---------- */
 .figma-judgment {
   background: #f7f9ff;
+  position: relative;
 }
 
 .figma-judgment__bg {
@@ -1401,6 +1419,24 @@
   height: 25vh;
   background: linear-gradient(to bottom, transparent, rgba(136, 178, 239, 0.2));
   z-index: 1;
+}
+
+/* 9-10페이지 심리스 브릿지 (하단) */
+.figma-judgment::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15vh;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(238, 243, 255, 0.7) 50%,
+    #eef3ff 100%
+  );
+  z-index: 2;
+  pointer-events: none;
 }
 
 .figma-judgment__content {
@@ -1579,9 +1615,9 @@
   overflow: hidden;
 }
 
-.figma-annex-intro__bg .dark-veil-canvas {
+.figma-annex-intro__bg canvas {
   mix-blend-mode: soft-light;
-  opacity: 0.9;
+  opacity: 0.7;
 }
 
 .figma-annex-intro__content {
@@ -1644,7 +1680,7 @@
 
 .figma-annex-decl__cards {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 260px));
+  grid-template-columns: repeat(4, minmax(0, 280px));
   gap: 24px;
   width: 100%;
   justify-content: center;
@@ -2212,6 +2248,18 @@
   background: radial-gradient(circle at 50% 50%, rgba(157, 191, 255, 0.15) 0%, transparent 70%);
 }
 
+.figma-annex-conductor__content {
+  align-items: center;
+  text-align: center;
+}
+
+.figma-annex-conductor__headline {
+  margin: clamp(18px, 2.5vh, 28px) 0 0;
+  font-size: clamp(32px, 4.2vw, 60px);
+  font-weight: 500;
+  color: #000;
+}
+
 .figma-annex-conductor__comparison {
   display: flex;
   align-items: center;
@@ -2312,7 +2360,8 @@
 
 /* ---------- annex cost curve (page 24) ---------- */
 .figma-annex-cost {
-  background: #f7f9ff;
+  background:
+    radial-gradient(120% 140% at 0% 0%, #dfe9ff 0%, #a6c2ff 38%, #6f8fe0 100%);
 }
 
 .figma-annex-cost__main {
@@ -2352,7 +2401,6 @@
 .figma-annex-cost__curve-path {
   stroke-dasharray: 600;
   stroke-dashoffset: 600;
-  transition: stroke-dashoffset 1.6s ease-out;
 }
 
 .figma-annex-cost__point {
@@ -2366,7 +2414,16 @@
 }
 
 .slide.on .figma-annex-cost__curve-path {
-  stroke-dashoffset: 0;
+  animation: figma-annex-cost-draw 1.6s ease-out forwards;
+}
+
+@keyframes figma-annex-cost-draw {
+  from {
+    stroke-dashoffset: 600;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .slide.on .figma-annex-cost__point--1 {
@@ -2408,13 +2465,18 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0;
   text-align: left;
+  padding: 32px 32px 28px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(243, 246, 249, 0.9) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 40px rgba(0, 37, 77, 0.12);
 }
 
 .figma-annex-cost__info-item {
-  padding-left: 20px;
-  border-left: 2px solid rgba(21, 29, 91, 0.1);
+  padding: 18px 0;
+  border-top: 1px solid rgba(21, 29, 91, 0.08);
 }
 
 .figma-annex-cost__info-item strong {
@@ -3373,6 +3435,7 @@ body.on-figma #hint::after {
 /* ---------- page 10 · loop ---------- */
 .figma-loop {
   background: #f7f9ff;
+  position: relative;
 }
 
 .figma-loop::before {
@@ -3635,7 +3698,46 @@ body.on-figma #hint::after {
   width: 100%;
 }
 
+/* 10-11페이지 심리스 브릿지 (하단) */
+.figma-loop::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15vh;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    #ffffff 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
 /* ---------- page 11 · claim ---------- */
+.figma-claim {
+  position: relative;
+}
+
+.figma-claim::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15vh;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    #ffffff 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
 .figma-claim__content {
   gap: clamp(16px, 2.5vh, 28px);
 }
@@ -3846,6 +3948,24 @@ body.on-figma #hint::after {
 /* ---------- page 14 · pilot ---------- */
 .figma-pilot {
   position: relative;
+}
+
+/* 13-14페이지 심리스 브릿지 (상단) */
+.figma-pilot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12vh;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    rgba(247, 249, 255, 0.85) 60%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* 14-15페이지 심리스 브릿지 (하단) */
@@ -4115,7 +4235,7 @@ body.on-figma #hint::after {
 
 /* ---------- alphago (page 15) ---------- */
 .figma-alphago {
-  background: #000; /* 베일이 잘 보이도록 블랙 배경 */
+  background: #E0E7EF; /* light blue background */
   position: relative;
 }
 
@@ -4133,7 +4253,7 @@ body.on-figma #hint::after {
   line-height: 1.3;
   letter-spacing: -0.02em;
   text-align: center;
-  color: #fff; /* 화이트로 변경 */
+  color: var(--figma-navy); /* Dark navy for light background */
 }
 
 .figma-alphago__headline strong {
@@ -4145,7 +4265,7 @@ body.on-figma #hint::after {
   margin-top: 20px;
   font-size: 14px;
   line-height: 1.6;
-  color: #ccc; /* 연한 그레이 */
+  color: var(--figma-ink); /* Darker ink for light background */
   text-align: center;
   opacity: 0.8;
 }
@@ -4183,31 +4303,31 @@ body.on-figma #hint::after {
 .figma-alphago .figma-glass-card {
   width: 100%;
   max-width: none;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.4); /* More opaque for light background */
+  border: 1px solid rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 .figma-alphago .figma-glass-card__title {
-  color: #fff;
+  color: var(--figma-navy);
 }
 
 .figma-alphago .figma-glass-card__desc {
-  color: rgba(255, 255, 255, 0.7);
+  color: #000;
 }
 
 .figma-alphago .figma-glass-panel {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .figma-alphago .figma-alphago__lesson-title {
-  color: #fff;
+  color: var(--figma-navy);
 }
 
 .figma-alphago .figma-alphago__lesson-desc {
-  color: rgba(255, 255, 255, 0.7);
+  color: #000;
 }
 
 .figma-alphago .figma-alphago__lesson-no {
@@ -4321,7 +4441,7 @@ body.on-figma #hint::after {
   color: #e2e8ff;
   margin: 0;
   max-width: 38em;
-  opacity: 0.85;
+  opacity: 0.42;
 }
 
 .figma-closing__highlight {

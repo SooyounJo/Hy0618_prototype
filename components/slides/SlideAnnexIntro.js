@@ -1,20 +1,16 @@
-import DarkVeil from "../DarkVeil";
+import Silk from "../Silk";
 
 export default function SlideAnnexIntro() {
   return (
     <section className="slide figma-slide figma-annex-intro" data-ch="a" data-title="부록 · 근거와 배경">
       <div className="figma-annex-intro__bg" aria-hidden="true">
-        <DarkVeil
-          color1="#d4d7e0"
-          color2="#9ea4b3"
-          color3="#f4f5f9"
-          noiseIntensity={0.02}
-          scanlineIntensity={0}
-          speed={0.6}
-          scanlineFrequency={3.0}
-          warpAmount={0.25}
-          resolutionScale={1.0}
-          centerY={0.0}
+        <Silk
+          speed={4}
+          scale={0.45}
+          color="#B5BECF"
+          color2="#FFFFFF"
+          noiseIntensity={1.2}
+          rotation={0.1}
         />
       </div>
       <div className="figma-slide__inner figma-annex-intro__content">

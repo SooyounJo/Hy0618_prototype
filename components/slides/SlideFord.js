@@ -1,4 +1,4 @@
-import DarkVeil from "../DarkVeil";
+import Silk from "../Silk";
 
 export default function SlideFord() {
   return (
@@ -9,17 +9,13 @@ export default function SlideFord() {
       data-title="포드 · 다시 설계할 시점"
     >
       <div className="figma-silk__bg" aria-hidden="true">
-        <DarkVeil
-          color1="#050814"
-          color2="#7f5af0"
-          color3="#b2c5ff"
-          noiseIntensity={0.03}
-          scanlineIntensity={0}
-          speed={1.0}
-          scanlineFrequency={3.5}
-          warpAmount={0.4}
-          resolutionScale={1.0}
-          centerY={-0.1}
+        <Silk
+          speed={5}
+          scale={0.4}
+          color="#5227FF"
+          color2="#000000"
+          noiseIntensity={1.5}
+          rotation={0}
         />
       </div>
 

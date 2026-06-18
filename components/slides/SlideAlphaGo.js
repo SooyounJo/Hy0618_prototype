@@ -1,4 +1,4 @@
-import DarkVeil from "../DarkVeil";
+import Silk from "../Silk";
 
 const CARDS = [
   {
@@ -43,17 +43,13 @@ export default function SlideAlphaGo() {
   return (
     <section className="slide figma-slide figma-alphago" data-ch="5" data-title="알파고의 교훈">
       <div className="figma-alphago__bg" aria-hidden="true">
-        <DarkVeil
-          color1="#000000"
-          color2="#4b0082"
-          color3="#0000ff"
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={0.8}
-          scanlineFrequency={3.5}
-          warpAmount={0.3}
-          resolutionScale={1.0}
-          centerY={-0.1}
+        <Silk
+          speed={4.5}
+          scale={0.4}
+          color="#6690FF"
+          color2="#E0E7EF"
+          noiseIntensity={0.4}
+          rotation={0.08}
         />
       </div>
       

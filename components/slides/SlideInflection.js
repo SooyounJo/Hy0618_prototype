@@ -1,98 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import CountUp from "../CountUp";
 
-function RouletteText({ value, delay, isActive }) {
-  const [displayValue, setDisplayValue] = useState("");
-  const [isDone, setIsDone] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-
-  useEffect(() => {
-    if (!isActive) {
-      setDisplayValue("");
-      setIsDone(false);
-      setHasStarted(false);
-      return;
-    }
-
-    if (hasStarted) return;
-
-    const delayMs = parseInt(delay) || 0;
-    let timer;
-    let startTimer;
-
-    startTimer = setTimeout(() => {
-      setHasStarted(true);
-      const duration = 2000; // 2 seconds duration
-      const interval = 40;
-      const totalSteps = duration / interval;
-      let step = 0;
-      
-      const getRand = () => value.split('').map(char => {
-        if (/\d/.test(char)) return Math.floor(Math.random() * 10);
-        if (/[가-힣]/.test(char)) return String.fromCharCode(0xAC00 + Math.floor(Math.random() * 11172));
-        return char;
-      }).join('');
-
-      setDisplayValue(getRand());
-
-      timer = setInterval(() => {
-        step++;
-        if (step >= totalSteps) {
-          setDisplayValue(value);
-          setIsDone(true);
-          clearInterval(timer);
-        } else {
-          setDisplayValue(getRand());
-        }
-      }, interval);
-    }, delayMs);
-
-    return () => {
-      clearTimeout(startTimer);
-      clearInterval(timer);
-    };
-  }, [value, delay, isActive, hasStarted]);
-
-  return <span className={isDone ? "is-settled" : "is-spinning"}>{displayValue || (isActive ? "" : value)}</span>;
-}
-
-const STATS = [
-  {
-    value: "3-6개월",
-    desc: "디자인 정체성은 AI 시대에 가장 대체 불가능한 자산입니다.",
-    delay: "1800ms",
-    roulette: true
-  },
-  {
-    value: "양방향",
-    desc: "수십 년 쌓인 디자이너의 판단을 외부 모델에 내주지 않습니다.",
-    delay: "2100ms"
-  }
-];
+const LEFT_DELAY = "1800ms";
+const RIGHT_DELAY = "2100ms";
 
 export default function SlideInflection() {
-  const [isActive, setIsActive] = useState(false);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsActive(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section 
-      ref={sectionRef}
       className="slide figma-slide figma-inflection" 
       id="inflection"
       data-ch="1" 
@@ -115,18 +28,33 @@ export default function SlideInflection() {
         </p>
 
         <div className="figma-inflection__stats">
-          {STATS.map((stat) => (
-            <article key={stat.value} className="figma-inflection__stat rv" style={{ "--rd": stat.delay }}>
-              <p className="figma-inflection__stat-value">
-                {stat.roulette ? (
-                  <RouletteText value={stat.value} delay={stat.delay} isActive={isActive} />
-                ) : (
-                  stat.value
-                )}
-              </p>
-              <p className="figma-inflection__stat-desc">{stat.desc}</p>
-            </article>
-          ))}
+          <article className="figma-inflection__stat rv" style={{ "--rd": LEFT_DELAY }}>
+            <p className="figma-inflection__stat-value">
+              <CountUp
+                from={0}
+                to={36}
+                duration={3}
+                delay={0.4}
+                className="figma-inflection__stat-number"
+                format={(latest) => {
+                  const rounded = Math.round(latest);
+                  const left = Math.floor(rounded / 10);
+                  const right = rounded % 10;
+                  return `${left}-${right}개월`;
+                }}
+              />
+            </p>
+            <p className="figma-inflection__stat-desc">
+              디자인 정체성은 AI 시대에 가장 대체 불가능한 자산입니다.
+            </p>
+          </article>
+
+          <article className="figma-inflection__stat rv" style={{ "--rd": RIGHT_DELAY }}>
+            <p className="figma-inflection__stat-value">양방향</p>
+            <p className="figma-inflection__stat-desc">
+              수십 년 쌓인 디자이너의 판단을 외부 모델에 내주지 않습니다.
+            </p>
+          </article>
         </div>
       </div>
     </section>
