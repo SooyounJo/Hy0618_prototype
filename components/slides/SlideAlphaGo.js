@@ -45,7 +45,7 @@ export default function SlideAlphaGo() {
       <div className="figma-alphago__bg" aria-hidden="true">
         <Silk
           speed={4.5}
-          scale={0.5}
+          scale={0.4}
           color="#6690FF"
           color2="#E0E7EF"
           noiseIntensity={0.4}

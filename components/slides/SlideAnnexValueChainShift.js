@@ -10,20 +10,22 @@ const STAGES = [
 
 function AnnexArrow({ delay }) {
   return (
-    <div className="figma-annex-vc__arrow-wrap rv" style={{ "--rd": delay }}>
-      <div className="figma-annex-vc__arrow-line" />
-      <svg
-        className="figma-annex-vc__arrow-head"
-        viewBox="0 0 10 9"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          d="M4.8641 4.62497C5.0878 4.40119 5.0878 4.03837 4.8641 3.81459L1.2173 0.167837C0.9935 -0.0559454 0.6307 -0.0559454 0.4069 0.167837C0.1831 0.39162 0.1831 0.754443 0.4069 0.978226L3.6485 4.21978L0.4069 7.46133C0.1831 7.68512 0.1831 8.04794 0.4069 8.27172C0.6307 8.49551 0.9935 8.49551 1.2173 8.27172L4.8641 4.62497Z"
-          fill="currentColor"
-        />
-      </svg>
+    <div className="figma-annex-vc__arrow-container rv" style={{ "--rd": delay }}>
+      <div className="figma-annex-vc__arrow-wrap">
+        <div className="figma-annex-vc__arrow-line" />
+        <svg
+          className="figma-annex-vc__arrow-head"
+          viewBox="0 0 10 9"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.8641 4.62497C5.0878 4.40119 5.0878 4.03837 4.8641 3.81459L1.2173 0.167837C0.9935 -0.0559454 0.6307 -0.0559454 0.4069 0.167837C0.1831 0.39162 0.1831 0.754443 0.4069 0.978226L3.6485 4.21978L0.4069 7.46133C0.1831 7.68512 0.1831 8.04794 0.4069 8.27172C0.6307 8.49551 0.9935 8.49551 1.2173 8.27172L4.8641 4.62497Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
     </div>
   );
 }

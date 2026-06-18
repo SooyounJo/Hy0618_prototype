@@ -17,7 +17,7 @@ export default function SlideAnnexPayoff() {
       <div className="figma-annex-payoff__bg" aria-hidden="true">
         <Silk
           speed={4}
-          scale={0.6}
+          scale={0.3}
           color="#C2CFE2"
           color2="#3D4552"
           noiseIntensity={1.5}

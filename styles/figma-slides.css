@@ -1741,31 +1741,31 @@
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.03em;
-  color: #000;
+  color: #000; /* 블랙으로 복구 */
 }
 
 .figma-annex-intro__headline strong {
   font-weight: 600;
-  color: var(--figma-navy);
+  color: #fff; /* 배경자료는 화이트 유지 */
 }
 
 .figma-annex-intro__summary {
   margin: clamp(20px, 3vh, 40px) 0 0;
   font-size: clamp(16px, 1.5vw, 20px);
   font-weight: 500;
-  color: var(--figma-ink);
-  opacity: 0.8;
+  color: #fff; /* 화이트로 변경 */
+  opacity: 0.9;
 }
 
 /* ---------- annex declaration (page 18) ---------- */
 .figma-annex-decl {
-  background: #f7f9ff;
+  background: #f5f5f5;
 }
 
 .figma-annex-decl__bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(60% 50% at 50% 50%, rgba(157, 191, 255, 0.2) 0%, transparent 100%);
+  background: radial-gradient(60% 50% at 50% 50%, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
 }
 
 .figma-annex-decl__content {
@@ -1799,7 +1799,7 @@
 .figma-annex-decl__card {
   padding: 32px 24px;
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(214, 226, 255, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 240, 240, 0.7) 100%);
   border: 1px solid rgba(255, 255, 255, 0.8);
   text-align: left;
   display: flex;
@@ -1837,7 +1837,7 @@
 
 /* ---------- annex history (page 19) ---------- */
 .figma-annex-history {
-  background: #f7f9ff;
+  background: #f5f5f5;
 }
 
 .figma-annex-history__headline {
@@ -2004,7 +2004,7 @@
 
 /* ---------- annex value chain (page 20) ---------- */
 .figma-annex-vc {
-  background: #f7f9ff;
+  background: #f5f5f5;
 }
 
 .figma-annex-vc__headline {
@@ -2061,12 +2061,22 @@
   font-family: var(--font-mono);
 }
 
-.figma-annex-vc__arrow-wrap {
+.figma-annex-vc__arrow-container {
   position: relative;
   width: 56px;
   height: 14px;
+}
+
+.figma-annex-vc__arrow-wrap {
   display: flex;
   align-items: center;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.figma-annex-vc__content.is-reversed .figma-annex-vc__arrow-wrap {
+  transform: scaleX(-1);
 }
 
 .figma-annex-vc__arrow-line {
@@ -2097,16 +2107,6 @@
   }
 }
 
-.figma-annex-vc__content.is-reversed .figma-annex-vc__arrow-line {
-  animation-name: figma-annex-vc-flow-reverse;
-}
-
-.figma-annex-vc__content.is-reversed .figma-annex-vc__arrow-head {
-  transform: scaleX(-1);
-  margin-left: 0;
-  margin-right: -3px;
-}
-
 .figma-annex-vc__stage--design {
   overflow: hidden;
 }
@@ -2114,25 +2114,33 @@
 .figma-annex-vc__content.is-reversed .figma-annex-vc__stage--design::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(120deg, rgba(77, 109, 255, 0.1), rgba(77, 109, 255, 0.7), rgba(77, 109, 255, 0.1));
-  background-size: 200% 200%;
+  padding: 2px; /* 테두리 두께 약간 확대 */
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(77, 109, 255, 0) 25%, 
+    rgba(77, 109, 255, 0.8) 50%, 
+    rgba(77, 109, 255, 0) 75%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
-  animation: figma-annex-vc-border-flow 1.4s linear infinite;
+  animation: figma-annex-vc-border-flow 2s linear infinite;
+  z-index: 1;
 }
 
 @keyframes figma-annex-vc-border-flow {
   0% {
-    background-position: 0% 50%;
+    background-position: 200% 0%;
   }
   100% {
-    background-position: 200% 50%;
+    background-position: 0% 0%;
   }
 }
 
@@ -2185,7 +2193,7 @@
 
 /* ---------- annex ecosystem (page 21) ---------- */
 .figma-annex-eco {
-  background: #f7f9ff;
+  background: #f5f5f5;
 }
 
 .figma-annex-eco__headline {
@@ -2252,7 +2260,7 @@
 
 .figma-annex-eco__def-box.is-answer {
   flex: 1.5;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(214, 226, 255, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(240, 240, 240, 0.6) 100%);
 }
 
 .figma-annex-eco__def-label {
@@ -2271,7 +2279,12 @@
 
 /* ---------- annex governance (page 22) ---------- */
 .figma-annex-gov {
-  background: #f7f9ff;
+  background: #f5f5f5;
+}
+
+.figma-annex-gov__content {
+  align-items: center;
+  text-align: center;
 }
 
 .figma-annex-gov__headline {
@@ -2279,7 +2292,8 @@
   font-size: clamp(30px, 4vw, 56px);
   font-weight: 500;
   color: #000;
-  max-width: 20em;
+  max-width: 30em;
+  text-align: center;
 }
 
 .figma-annex-gov__headline strong {
@@ -2348,13 +2362,13 @@
 
 /* ---------- annex conductor (page 23) ---------- */
 .figma-annex-conductor {
-  background: #f7f9ff;
+  background: #f5f5f5;
 }
 
 .figma-annex-conductor__bg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(157, 191, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.05) 0%, transparent 70%);
 }
 
 .figma-annex-conductor__content {
@@ -2469,8 +2483,7 @@
 
 /* ---------- annex cost curve (page 24) ---------- */
 .figma-annex-cost {
-  background:
-    radial-gradient(120% 140% at 0% 0%, #dfe9ff 0%, #a6c2ff 38%, #6f8fe0 100%);
+  background: linear-gradient(180deg, #eeeeee 0%, #dcdcdc 100%);
 }
 
 .figma-annex-cost__content {
@@ -2542,6 +2555,33 @@
   aspect-ratio: 500 / 120; /* 더 납작하게 */
   overflow: visible;
 }
+
+.figma-annex-cost__curve-path {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 1.2s;
+}
+
+.slide.on .figma-annex-cost__curve-path {
+  stroke-dashoffset: 0;
+}
+
+.figma-annex-cost__point {
+  fill: var(--figma-navy);
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slide.on .figma-annex-cost__point {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.figma-annex-cost__point--1 { transition-delay: 1.4s; transform-origin: 40px 189px; }
+.figma-annex-cost__point--2 { transition-delay: 2.0s; transform-origin: 250px 160px; }
+.figma-annex-cost__point--3 { transition-delay: 2.6s; transform-origin: 460px 45px; }
 
 .figma-annex-cost__x-labels {
   display: flex;
@@ -2640,7 +2680,7 @@
 
 /* ---------- annex warroom (page 25) ---------- */
 .figma-annex-warroom {
-  background: linear-gradient(180deg, #f4f7f9 0%, #ced9e5 80%, #dde9f1 100%);
+  background: linear-gradient(180deg, #dcdcdc 0%, #eeeeee 100%);
 }
 
 .figma-annex-warroom__headline {
@@ -2696,9 +2736,9 @@
 
 .figma-annex-warroom__diagram {
   position: relative;
-  width: 420px;
-  height: 420px;
-  margin: 0;
+  width: 350px; /* 좀 더 축소 */
+  height: 350px;
+  margin: 0 0 0 100px; /* 우측으로 더 이동 */
 }
 
 .figma-annex-warroom__table-circle {
@@ -2712,7 +2752,7 @@
 }
 
 .figma-annex-warroom__table-label {
-  font-size: 22px;
+  font-size: 18px; /* 텍스트 사이즈 좀 더 축소 */
   font-weight: 700;
   color: var(--figma-navy);
   letter-spacing: 0.04em;
@@ -2722,25 +2762,25 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 110px; /* 사이즈 대폭 확대 */
-  height: 110px;
-  margin: -55px;
-  transform: rotate(calc(var(--idx) * 45deg)) translateY(-175px) rotate(calc(var(--idx) * -45deg));
+  width: 84px; /* 개별 원 사이즈 좀 더 축소 */
+  height: 84px;
+  margin: -42px;
+  transform: rotate(calc(var(--idx) * 45deg)) translateY(-135px) rotate(calc(var(--idx) * -45deg));
 }
 
 .figma-annex-warroom__seat-inner {
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 50%, #fff 0%, #eef3ff 100%);
+  background: radial-gradient(circle at 50% 50%, #fff 0%, #f0f0f0 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11.5px; /* 폰트 사이즈 확대 */
+  font-size: 11px; /* 폰트 사이즈 약간 축소 */
   font-weight: 700;
   color: #8a96b0;
   text-align: center;
-  padding: 12px;
+  padding: 10px;
   box-shadow: 
     0 10px 30px rgba(0, 44, 95, 0.08),
     inset 0 2px 8px #fff;
@@ -2833,7 +2873,7 @@
 
 /* ---------- annex workflows (page 26) ---------- */
 .figma-annex-workflows {
-  background: radial-gradient(120% 120% at 50% 50%, #f7f9ff 0%, #dde9f1 100%);
+  background: linear-gradient(180deg, #eeeeee 0%, #dcdcdc 100%);
 }
 
 .figma-annex-workflows__content {
@@ -2994,7 +3034,7 @@
 
 /* ---------- annex rendersmith (page 27) ---------- */
 .figma-annex-rendersmith {
-  background: radial-gradient(120% 120% at 50% 50%, #f7f9ff 0%, #dde9f1 100%);
+  background: linear-gradient(180deg, #dcdcdc 0%, #eeeeee 100%);
 }
 
 .figma-annex-rendersmith__content {
@@ -3018,7 +3058,7 @@
 
 .figma-annex-rendersmith__summary {
   margin: clamp(14px, 2vh, 24px) 0 0;
-  max-width: 52em;
+  max-width: none;
   font-size: clamp(12px, 1.1vw, 15px);
   line-height: 1.6;
   color: var(--figma-ink);
@@ -3173,7 +3213,7 @@
 
 /* ---------- annex milestone (page 28) ---------- */
 .figma-annex-milestone {
-  background: radial-gradient(120% 120% at 50% 50%, #f7f9ff 0%, #dde9f1 100%);
+  background: linear-gradient(180deg, #eeeeee 0%, #dcdcdc 100%);
 }
 
 .figma-annex-milestone__content {
@@ -3358,7 +3398,26 @@
 
 /* ---------- annex payoff (page 29) ---------- */
 .figma-annex-payoff {
-  background: radial-gradient(120% 120% at 50% 50%, #f7f9ff 0%, #dde9f1 100%);
+  background: #E0E7EF;
+}
+
+.figma-annex-payoff__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      80% 70% at 50% 0%,
+      rgba(181, 190, 207, 0.6) 0%,
+      rgba(210, 217, 230, 0.85) 18%,
+      rgba(224, 231, 239, 0.98) 72%
+    ),
+    linear-gradient(180deg, #E0E7EF 0%, #D1D9E6 100%);
+  overflow: hidden;
+}
+
+.figma-annex-payoff__bg canvas {
+  mix-blend-mode: multiply;
+  opacity: 0.6;
 }
 
 .figma-annex-payoff__content {

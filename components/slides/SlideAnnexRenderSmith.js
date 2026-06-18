@@ -35,9 +35,7 @@ export default function SlideAnnexRenderSmith() {
         </h2>
 
         <p className="figma-annex-rendersmith__summary rv" style={{ "--rd": "1000ms" }}>
-          언리얼 엔진 기반 웹 렌더 시스템 위에서 컬러 사양서(CPL/CCC)가 자동화되고, 디자인 데이터가 컨피규레이터를 거쳐 소비자까지 끊기지 않고 흐릅니다.
-          <br />
-          파편화된 엑셀과 수작업 사양서가 만들던 왜곡 · 휴먼에러 · 리워크의 사슬을 데이터 하나로 대체합니다.
+          언리얼 엔진 기반 웹 렌더 시스템 위에서 컬러 사양서(CPL/CCC)가 자동화되고, 디자인 데이터가 컨피규레이터를 거쳐 소비자까지 끊기지 않고 흐릅니다. 파편화된 엑셀과 수작업 사양서가 만들던 왜곡 · 휴먼에러 · 리워크의 사슬을 데이터 하나로 대체합니다.
         </p>
 
         <div className="figma-annex-rendersmith__grid">

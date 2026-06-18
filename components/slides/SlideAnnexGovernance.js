@@ -8,7 +8,7 @@ export default function SlideAnnexGovernance() {
         </div>
 
         <h2 className="figma-annex-gov__headline rv head" style={{ "--rd": "600ms" }}>
-          받침대가 견고하면, <strong>연장이 좋아질수록 </strong> 결과도 함께 좋아집니다
+          받침대가 견고하면, <strong>연장이 좋아질수록</strong><br />결과도 함께 좋아집니다
         </h2>
 
         <div className="figma-annex-gov__grid">
