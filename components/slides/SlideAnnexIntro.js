@@ -6,10 +6,10 @@ export default function SlideAnnexIntro() {
       <div className="figma-annex-intro__bg" aria-hidden="true">
         <Silk
           speed={4}
-          scale={0.45}
-          color="#B5BECF"
-          color2="#E0E7EF"
-          noiseIntensity={1.2}
+          scale={0.6}
+          color="#C2CFE2"
+          color2="#3D4552"
+          noiseIntensity={1.5}
           rotation={0.1}
         />
       </div>

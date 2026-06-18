@@ -16,30 +16,52 @@ export default function SlideAnnexCostCurve() {
         </div>
 
         <h2 className="figma-annex-cost__headline rv head" style={{ "--rd": "600ms" }}>
-          가장 이른 단계에서, 가장 많이 검토하고, <strong>가장 많이 합의합니다</strong>
+          가장 이른 단계에서, 가장 많이 검토하고,<br /><strong>가장 많이 합의합니다</strong>
         </h2>
 
         <div className="figma-annex-cost__main">
-          <div className="figma-annex-cost__chart-area rv" style={{ "--rd": "1200ms" }}>
-            <div className="figma-annex-cost__chart-label">변경 비용</div>
-            <div className="figma-annex-cost__chart-wrapper">
-              <svg className="figma-annex-cost__curve" viewBox="0 0 500 200" preserveAspectRatio="none">
-                <path
-                  className="figma-annex-cost__curve-path"
-                  d="M0,190 Q250,180 500,10"
-                  fill="none"
-                  stroke="var(--figma-navy)"
-                  strokeWidth="2"
-                />
-                <circle className="figma-annex-cost__point figma-annex-cost__point--1" cx="20" cy="188" r="4" />
-                <circle className="figma-annex-cost__point figma-annex-cost__point--2" cx="250" cy="165" r="4" />
-                <circle className="figma-annex-cost__point figma-annex-cost__point--3" cx="480" cy="20" r="4" />
-              </svg>
-              <div className="figma-annex-cost__x-labels">
-                <span className="is-active">컨셉</span>
-                <span>설계 · 개발</span>
-                <span>금형</span>
+          <div className="figma-annex-cost__left">
+            <div className="figma-annex-cost__chart-area rv" style={{ "--rd": "1200ms" }}>
+              <div className="figma-annex-cost__chart-label">변경 비용</div>
+              <div className="figma-annex-cost__chart-wrapper">
+                <svg className="figma-annex-cost__curve" viewBox="0 0 500 200">
+                  <path
+                    className="figma-annex-cost__curve-path"
+                    d="M10,190 C150,190 350,170 490,10"
+                    fill="none"
+                    stroke="var(--figma-navy)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                  <circle className="figma-annex-cost__point figma-annex-cost__point--1" cx="40" cy="189" r="5" />
+                  <circle className="figma-annex-cost__point figma-annex-cost__point--2" cx="250" cy="160" r="5" />
+                  <circle className="figma-annex-cost__point figma-annex-cost__point--3" cx="460" cy="45" r="5" />
+                </svg>
+                <div className="figma-annex-cost__x-labels">
+                  <span className="is-active">컨셉</span>
+                  <span>설계 · 개발</span>
+                  <span>금형</span>
+                </div>
               </div>
+            </div>
+
+            <div className="figma-annex-cost__stats">
+              {STATS.map((stat, index) => (
+                <div key={stat.label} className="figma-annex-cost__stat-card rv" style={{ "--rd": `${1800 + index * 150}ms` }}>
+                  <p className="figma-annex-cost__stat-value">
+                    <CountUp
+                      from={0}
+                      to={stat.value}
+                      duration={1.6}
+                      delay={0.4 + index * 0.2}
+                      className="figma-annex-cost__stat-number"
+                      separator=","
+                    />
+                    <span>{stat.isApprox ? "수천" : stat.unit}</span>
+                  </p>
+                  <p className="figma-annex-cost__stat-label">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -57,25 +79,6 @@ export default function SlideAnnexCostCurve() {
               <p>우리 구조에서는 엔지니어링, 구매, 품질의 제약이 초기 탐색 입력값으로 들어옵니다. 제약을 보다 일찍 받아, 재작업 비용을 줄입니다.</p>
             </div>
           </div>
-        </div>
-
-        <div className="figma-annex-cost__stats">
-          {STATS.map((stat, index) => (
-            <div key={stat.label} className="figma-annex-cost__stat-card rv" style={{ "--rd": `${1800 + index * 150}ms` }}>
-              <p className="figma-annex-cost__stat-value">
-                <CountUp
-                  from={0}
-                  to={stat.value}
-                  duration={1.6}
-                  delay={0.4 + index * 0.2}
-                  className="figma-annex-cost__stat-number"
-                  separator=","
-                />
-                <span>{stat.isApprox ? "수천" : stat.unit}</span>
-              </p>
-              <p className="figma-annex-cost__stat-label">{stat.label}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>

@@ -23,6 +23,10 @@ export default function SlideAnnexMilestone() {
     <section className="slide figma-slide figma-annex-milestone" data-ch="a" data-title="마일스톤 단축">
       <div className="figma-annex-milestone__bg" aria-hidden="true" />
       <div className="figma-slide__inner figma-annex-milestone__content">
+        <div className="figma-pill rv" style={{ "--rd": "200ms" }}>
+          현장 기록 04 • FIELD EVIDENCE
+        </div>
+
         <h2 className="figma-annex-milestone__headline rv head" style={{ "--rd": "600ms" }}>
           구조를 바꾸면 달력이 바뀝니다. <strong>선행 기획 5개월 단축</strong>
         </h2>
@@ -37,8 +41,9 @@ export default function SlideAnnexMilestone() {
             <span className="figma-annex-milestone__row-label">As - is</span>
             <div className="figma-annex-milestone__track">
               {AS_IS.map((item, idx) => (
-                <div key={idx} className="figma-annex-milestone__point">
+                <div key={idx} className="figma-annex-milestone__point" style={{ "--idx": idx }}>
                   <span className="figma-annex-milestone__m">{item.m}</span>
+                  <span className="figma-annex-milestone__dot" />
                   <span className="figma-annex-milestone__p-label">{item.label}</span>
                 </div>
               ))}
@@ -49,16 +54,19 @@ export default function SlideAnnexMilestone() {
             <span className="figma-annex-milestone__row-label">To - be</span>
             <div className="figma-annex-milestone__track">
               {TO_BE.map((item, idx) => (
-                <div key={idx} className={`figma-annex-milestone__point ${item.highlight ? 'is-highlight' : ''}`}>
+                <div key={idx} className={`figma-annex-milestone__point ${item.highlight ? 'is-highlight' : ''}`} style={{ "--idx": idx }}>
                   <span className="figma-annex-milestone__m">{item.m}</span>
+                  <span className="figma-annex-milestone__dot" />
                   <span className="figma-annex-milestone__p-label">{item.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="figma-annex-milestone__reduction">
-            선행 기획 단계 5개월 단축
+          <div className="figma-annex-milestone__highlight-box">
+            <div className="figma-annex-milestone__reduction">
+              선행 기획 단계 5개월 단축
+            </div>
           </div>
         </div>
 

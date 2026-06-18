@@ -33,12 +33,12 @@ export default function SlideAnnexValueChain() {
 
   return (
     <section
-      className={`slide figma-slide figma-annex-vc${isReversed ? " figma-annex-vc--reversed" : ""}`}
+      className="slide figma-slide figma-annex-vc"
       data-ch="a"
       data-title="소유 지점의 이동"
     >
       <div className="figma-annex-vc__bg" aria-hidden="true" />
-      <div className="figma-slide__inner figma-annex-vc__content">
+      <div className={`figma-slide__inner figma-annex-vc__content ${isReversed ? "is-reversed" : ""}`}>
         <div className="figma-pill rv" style={{ "--rd": "250ms" }}>
           보조 인터랙션 · 흐름을 되돌리다
         </div>

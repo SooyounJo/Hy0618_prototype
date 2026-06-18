@@ -26,6 +26,10 @@ export default function SlideAnnexRenderSmith() {
     <section className="slide figma-slide figma-annex-rendersmith" data-ch="a" data-title="Render Smith">
       <div className="figma-annex-rendersmith__bg" aria-hidden="true" />
       <div className="figma-slide__inner figma-annex-rendersmith__content">
+        <div className="figma-pill rv" style={{ "--rd": "200ms" }}>
+          현장 기록 03 • FIELD EVIDENCE
+        </div>
+
         <h2 className="figma-annex-rendersmith__headline rv head" style={{ "--rd": "600ms" }}>
           '마스터 프린트'의 실물, <strong>RenderSmith와 하나의 데이터</strong>
         </h2>

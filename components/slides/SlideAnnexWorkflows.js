@@ -26,13 +26,17 @@ export default function SlideAnnexWorkflows() {
     <section className="slide figma-slide figma-annex-workflows" data-ch="a" data-title="내재화 워크플로우">
       <div className="figma-annex-workflows__bg" aria-hidden="true" />
       <div className="figma-slide__inner figma-annex-workflows__content">
+        <div className="figma-pill rv" style={{ "--rd": "200ms" }}>
+          현장 기록 02 • FIELD EVIDENCE
+        </div>
+
         <h2 className="figma-annex-workflows__headline rv head" style={{ "--rd": "600ms" }}>
           ‘무한 셔터’의 실물, <strong>네 개의 내재화 워크플로우</strong>
         </h2>
 
         <p className="figma-annex-workflows__summary rv" style={{ "--rd": "1000ms" }}>
-          ComfyUI • Copilot • Gemini의 인트라넷 내재화 위에서 LoRA 학습. Key Image 생성, 3D 자동생성, 영상 제작이 스터디 단계를 마쳤습니다. <br />
-          탐색은 이미 도구가 아니라 <strong>프로세스 초안</strong>으로 존재합니다.
+          ComfyUI • Copilot • Gemini의 인트라넷 내재화 위에서 LoRA 학습. Key Image 생성, 3D 자동생성, <br />
+          영상 제작이 스터디 단계를 마쳤습니다. 탐색은 이미 도구가 아니라 <strong>프로세스 초안</strong>으로 존재합니다.
         </p>
 
         <div className="figma-annex-workflows__grid">
@@ -45,26 +49,25 @@ export default function SlideAnnexWorkflows() {
           ))}
         </div>
 
-        <div className="figma-annex-workflows__comparison rv" style={{ "--rd": "2200ms" }}>
-          <div className="figma-annex-workflows__comp-box is-asis">
-            <span className="figma-annex-workflows__comp-label">As-is</span>
-            <p>추상적 소통 • 순차적 검토 • 높은 불확실성</p>
+        <div className="figma-annex-workflows__comparison-grid rv" style={{ "--rd": "2200ms" }}>
+          <div className="figma-annex-workflows__comp-panel is-asis">
+            <div className="figma-annex-workflows__comp-header">
+              <strong>As-is</strong>
+              <span>추상적 소통 • 순차적 검토 • 높은 불확실성</span>
+            </div>
+            <div className="figma-annex-workflows__tags">
+              <span>Tangibility 실체화</span>
+              <span>Certainty 확실성</span>
+              <span>Integration-Connection 통합과 연결</span>
+            </div>
           </div>
-          <div className="figma-annex-workflows__comp-arrow">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className="figma-annex-workflows__comp-box is-tobe">
-            <span className="figma-annex-workflows__comp-label">To-be</span>
-            <p>실제적 소통 • 양방향 검토 • 선행 단계 사전검증</p>
-          </div>
-        </div>
 
-        <div className="figma-annex-workflows__tags rv" style={{ "--rd": "2600ms" }}>
-          <span>Tangibility 실체화</span>
-          <span>Certainty 확실성</span>
-          <span>Integration-Connection 통합과 연결</span>
+          <div className="figma-annex-workflows__comp-panel is-tobe">
+            <div className="figma-annex-workflows__comp-header">
+              <strong>To-be</strong>
+              <span>실제적 소통 • 양방향 검토 • 선행 단계 사전검증</span>
+            </div>
+          </div>
         </div>
 
         <div className="figma-annex-workflows__footnote rv" style={{ "--rd": "2800ms" }}>

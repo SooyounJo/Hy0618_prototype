@@ -6,7 +6,7 @@ export default function SlideNadella() {
       <div className="figma-silk__bg" aria-hidden="true">
         <Silk
           speed={4.5}
-          scale={0.4}
+          scale={0.5}
           color="#6690FF"
           color2="#E0E7EF"
           noiseIntensity={0.4}

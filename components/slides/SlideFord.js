@@ -13,7 +13,7 @@ export default function SlideFord() {
           speed={5}
           scale={0.4}
           color="#5227FF"
-          color2="#000000"
+          color2="#1A1A1A"
           noiseIntensity={1.5}
           rotation={0}
         />

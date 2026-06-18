@@ -1,3 +1,5 @@
+import Silk from "../Silk";
+
 const PAYOFFS = [
   { title: "속도", desc: "개발 사이클 단축" },
   { title: "비용", desc: "변경비용의 조기 절감" },
@@ -12,7 +14,16 @@ const PAYOFFS = [
 export default function SlideAnnexPayoff() {
   return (
     <section className="slide figma-slide figma-annex-payoff" data-ch="a" data-title="성과로 착지">
-      <div className="figma-annex-payoff__bg" aria-hidden="true" />
+      <div className="figma-annex-payoff__bg" aria-hidden="true">
+        <Silk
+          speed={4}
+          scale={0.6}
+          color="#C2CFE2"
+          color2="#3D4552"
+          noiseIntensity={1.5}
+          rotation={0.1}
+        />
+      </div>
       <div className="figma-slide__inner figma-annex-payoff__content">
         <div className="figma-pill rv" style={{ "--rd": "250ms" }}>
           THE PAYOFF • 성과로 착지
