@@ -1,0 +1,2 @@
+export const deckChromeHtml = "<div id=\"brand\"><span class=\"mark\"></span>PROJECT LOONSHOT</div>\n<div id=\"counter\"><b>01</b> / <span id=\"total\">00</span></div>\n<nav id=\"nav\"></nav>\n<div id=\"progress\"><span class=\"track\"></span><i></i></div>\n<div id=\"hint\"><span class=\"key\">↑ ↓</span> 슬라이드 이동</div>\n\n{{DECK}}";
+export const deckSlidesRestHtml = "";

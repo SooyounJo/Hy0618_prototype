@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT LOONSHOT · Design AI 전략 보고</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* — dark register (감정 비트) — */
+  --d-bg:#0D0D0F; --d-surface:#17171B; --d-surface2:#1F1F24;
+  --d-ink:#E8E3DB; --d-muted:#8F8B84; --d-line:rgba(232,227,219,.10);
+  --d-accent:#9E7B5A; --d-accent-bright:#C49A6C;
+  /* — light register (따뜻한 크림, 본문) — */
+  --l-bg:#F4EFE6; --l-surface:#FBF7EF; --l-surface2:#FFFDF8;
+  --l-ink:#2A2520; --l-muted:#6F665A; --l-line:rgba(42,37,32,.13);
+  --l-accent:#9A6F44; --l-accent-bright:#B5814F;
+  --l-blue:#5C68C0; --l-blue-bright:#939FD8;
+  --d-blue:#939FD8;
+  --blue-dim:rgba(147,159,216,.20);
+  --copper-dim:rgba(158,123,90,.28);
+  /* — evidence register (현장 기록, 쿨 페이퍼) — */
+  --ev-blue:#46618F; --ev-rust:#A8564A; --ev-ink:#2B3240;
+  --sans:'Pretendard Variable',Pretendard,-apple-system,sans-serif;
+  --serif:'Noto Serif KR',serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--l-bg);color:var(--l-ink);
+  font-family:var(--sans);font-weight:300;
+  overflow:hidden;word-break:keep-all;overflow-wrap:break-word;
+}
+::selection{background:var(--l-accent);color:#fff}
+
+/* ---------- deck scaffold ---------- */
+#deck{
+  height:100vh;height:100dvh;overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+}
+#deck::-webkit-scrollbar{display:none}
+
+/* every slide resolves semantic tokens; default = light register */
+.slide{
+  --bg:var(--l-bg); --surface:var(--l-surface); --surface2:var(--l-surface2);
+  --ink:var(--l-ink); --muted:var(--l-muted); --line:var(--l-line);
+  --accent:var(--l-accent); --accent-bright:var(--l-accent-bright);
+  --blue:var(--l-blue); --blue-bright:var(--l-blue-bright);
+  min-height:100vh;min-height:100dvh;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(24px,6vw,96px) clamp(24px,8vw,120px);
+  position:relative;background:var(--bg);color:var(--ink);
+  transition:background .6s ease;
+}
+.slide.dark{
+  --bg:var(--d-bg); --surface:var(--d-surface); --surface2:var(--d-surface2);
+  --ink:var(--d-ink); --muted:var(--d-muted); --line:var(--d-line);
+  --accent:var(--d-accent); --accent-bright:var(--d-accent-bright);
+  --blue:var(--d-blue); --blue-bright:var(--d-blue);
+}
+/* blue = 경영층 요청(소유권·승인) 라인 전용 보조 액센트 */
+b.blue,.hl-blue{color:var(--blue);font-weight:600}
+.eyebrow.ask-eye{color:var(--blue)}
+.inner{width:100%;max-width:1180px;margin:0 auto}
+
+/* ---------- two lines signature ---------- */
+.twolines{position:relative;display:block;width:64px;height:7px;margin-bottom:28px}
+.twolines::before,.twolines::after{
+  content:"";position:absolute;left:0;height:1px;width:100%;
+  background:var(--accent);transform-origin:left;
+  transform:scaleX(0);transition:transform 1.1s cubic-bezier(.22,1,.36,1)
+}
+.twolines::before{top:0}
+.twolines::after{bottom:0;transition-delay:.18s}
+.slide.on .twolines::before,.slide.on .twolines::after{transform:scaleX(1)}
+
+/* ---------- type roles ---------- */
+.eyebrow{
+  font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--accent-bright);font-weight:600;margin-bottom:18px;
+}
+h1{font-size:clamp(40px,7vw,96px);font-weight:200;letter-spacing:-.015em;line-height:1.06}
+h2{font-size:clamp(28px,4.4vw,54px);font-weight:300;letter-spacing:-.01em;line-height:1.18;margin-bottom:28px}
+h2 b,h1 b{font-weight:600;color:var(--accent-bright)}
+.lede{font-size:clamp(16px,1.6vw,20px);color:var(--muted);line-height:1.85;max-width:46em}
+.lede b{color:var(--ink);font-weight:600}
+p{line-height:1.85}
+
+/* ---------- reveal system ---------- */
+.rv{
+  opacity:0;transform:translateY(22px);
+  transition:opacity .9s ease,transform 1.05s cubic-bezier(.22,1,.36,1);
+  transition-delay:var(--rd,0ms);
+}
+.rv.head{transform:translateY(30px);transition-duration:1.25s,1.25s}
+.rv.soft{transform:none;transition-duration:1.6s,1.6s}
+.ln{display:inline-block}
+.slide.on .rv{opacity:1;transform:none}
+
+/* ============================================================
+   CHROME — adapts: dark text on light slides, light text on dark
+   ============================================================ */
+#brand{
+  position:fixed;top:26px;left:clamp(96px,11vw,150px);z-index:60;
+  font-size:11px;letter-spacing:.3em;color:var(--l-muted);font-weight:600;
+  display:flex;align-items:center;gap:14px;text-transform:uppercase;transition:color .5s;
+}
+#brand .mark{width:30px;height:5px;position:relative}
+#brand .mark::before,#brand .mark::after{content:"";position:absolute;left:0;width:100%;height:1px;background:var(--l-accent);transition:background .5s}
+#brand .mark::before{top:0}#brand .mark::after{bottom:0}
+#counter{
+  position:fixed;top:26px;right:clamp(24px,4vw,48px);z-index:60;
+  font-size:12px;letter-spacing:.18em;color:var(--l-muted);font-variant-numeric:tabular-nums;transition:color .5s;
+}
+#counter b{color:var(--l-ink);font-weight:600;transition:color .5s}
+
+/* clickable progress bar */
+#progress{position:fixed;bottom:0;left:0;width:100%;height:14px;z-index:60;cursor:pointer}
+#progress .track{position:absolute;left:0;top:6px;width:100%;height:2px;background:var(--l-line);transition:background .5s}
+#progress i{position:absolute;left:0;top:6px;height:2px;background:var(--l-accent);width:0;transition:width .5s ease,background .5s}
+#progress:hover .track{height:3px}
+
+#hint{
+  position:fixed;bottom:26px;right:clamp(24px,4vw,48px);z-index:60;
+  font-size:10px;letter-spacing:.26em;color:var(--l-muted);text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;transition:opacity .6s,color .5s;
+}
+#hint .key{border:1px solid var(--l-line);padding:3px 7px;border-radius:3px;color:var(--l-accent)}
+
+/* dark-chrome state (current slide is dark) */
+body.on-dark{background:var(--d-bg)}
+body.on-dark #brand{color:var(--d-muted)}
+body.on-dark #brand .mark::before,body.on-dark #brand .mark::after{background:var(--d-accent)}
+body.on-dark #counter{color:var(--d-muted)}
+body.on-dark #counter b{color:var(--d-ink)}
+body.on-dark #progress .track{background:var(--d-line)}
+body.on-dark #progress i{background:var(--d-accent)}
+body.on-dark #hint{color:var(--d-muted)}
+body.on-dark #hint .key{border-color:var(--d-line);color:var(--d-accent-bright)}
+
+/* ============================================================
+   SECTION INDEX — left rail, 10 chapters, click to jump
+   ============================================================ */
+#nav{
+  position:fixed;top:50%;left:12px;transform:translateY(-50%);z-index:60;
+  display:flex;flex-direction:column;gap:2px;padding:8px 6px;border-radius:14px;
+  transition:background .35s,box-shadow .35s,backdrop-filter .35s;
+}
+#nav:hover{background:rgba(251,247,239,.86);box-shadow:0 16px 40px rgba(42,37,32,.14);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+body.on-dark #nav:hover{background:rgba(23,23,27,.82);box-shadow:0 16px 40px rgba(0,0,0,.45)}
+#nav a{
+  display:flex;align-items:center;gap:11px;text-decoration:none;
+  padding:5px 8px;border-radius:8px;color:var(--l-muted);
+  transition:color .35s,background .35s;cursor:pointer;
+}
+#nav a.active:not(:hover){background:rgba(251,247,239,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+body.on-dark #nav a.active:not(:hover){background:rgba(31,31,36,.7)}
+#nav:hover a.active:not(:hover){background:transparent}
+#nav a .dot{
+  width:7px;height:7px;flex:none;border:1px solid currentColor;border-radius:50%;
+  transition:background .3s,transform .3s,border-color .3s;
+}
+#nav a .nx{font-family:var(--mono);font-size:10px;letter-spacing:.08em;width:18px;flex:none;opacity:.7}
+#nav a .nl{
+  font-size:11.5px;letter-spacing:.01em;white-space:nowrap;
+  max-width:0;overflow:hidden;opacity:0;
+  transition:max-width .4s ease,opacity .35s ease;
+}
+#nav:hover a .nl{max-width:260px;opacity:.9}
+#nav a:hover{color:var(--l-ink)}
+#nav a.active{color:var(--l-accent)}
+#nav a.active .dot{background:var(--l-accent);border-color:var(--l-accent);transform:scale(1.15)}
+#nav a.active .nl{max-width:260px;opacity:1}
+/* dark adaptation */
+body.on-dark #nav a{color:var(--d-muted)}
+body.on-dark #nav a:hover{color:var(--d-ink)}
+body.on-dark #nav a.active{color:var(--d-accent-bright)}
+body.on-dark #nav a.active .dot{background:var(--d-accent-bright);border-color:var(--d-accent-bright)}
+
+/* ---------- act dividers ---------- */
+.act{align-items:flex-start;justify-content:center;
+  background:
+    radial-gradient(60% 50% at 78% 30%,rgba(158,123,90,.10),transparent 70%),
+    var(--bg);
+}
+.act .gmatrix{
+  position:absolute;inset:0;opacity:.05;pointer-events:none;
+  background-image:
+    linear-gradient(45deg,var(--accent) 1px,transparent 1px),
+    linear-gradient(-45deg,var(--accent) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(70% 70% at 70% 40%,#000,transparent 75%);
+          mask-image:radial-gradient(70% 70% at 70% 40%,#000,transparent 75%);
+}
+.actnum{font-size:12px;letter-spacing:.4em;color:var(--accent-bright);font-weight:600;text-transform:uppercase;margin-bottom:26px}
+.act h1 em{font-style:normal;color:var(--muted);font-weight:200}
+.act .sub{margin-top:34px;font-size:clamp(15px,1.5vw,19px);color:var(--muted);line-height:2;max-width:42em}
+.act .sub b{color:var(--ink);font-weight:600}
+
+/* ---------- cover ---------- */
+#cover{
+  background:
+    radial-gradient(70% 55% at 50% 110%,rgba(196,154,108,.20),transparent 70%),
+    var(--d-bg);
+  text-align:center;align-items:center;
+}
+#cover .twolines{margin:0 auto 40px;width:96px;height:9px}
+#cover .twolines::after{transition-delay:.3s}
+#cover h1{margin-bottom:8px}
+#cover .title-sub{font-size:clamp(13px,1.4vw,17px);letter-spacing:.5em;color:var(--muted);text-transform:uppercase;margin-bottom:54px}
+#cover .thesis{font-size:clamp(17px,2vw,24px);font-weight:300;color:var(--ink);line-height:1.7}
+#cover .thesis b{color:var(--accent-bright);font-weight:500}
+#cover .horizon{
+  position:absolute;bottom:0;left:0;width:100%;height:34vh;pointer-events:none;
+  background:linear-gradient(to top,rgba(158,123,90,.12),transparent);
+  -webkit-mask-image:linear-gradient(to top,#000,transparent);mask-image:linear-gradient(to top,#000,transparent);
+}
+
+/* ---------- flags ---------- */
+.flags{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:44px}
+.flag{background:var(--surface);padding:34px 26px;min-height:240px;display:flex;flex-direction:column;gap:14px;transition:background .5s,transform .5s,box-shadow .5s}
+.flag:hover{background:var(--surface2);transform:translateY(-3px);box-shadow:0 18px 40px rgba(42,37,32,.10)}
+.flag .no{font-size:11px;letter-spacing:.3em;color:var(--accent-bright);font-weight:600}
+.flag h3{font-size:19px;font-weight:600;line-height:1.4;color:var(--ink)}
+.flag h3 span{display:block;font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:400;text-transform:uppercase;margin-top:6px}
+.flag p{font-size:13.5px;color:var(--muted);line-height:1.8;flex:1}
+.flag q{font-size:13px;color:var(--accent);font-weight:500;quotes:"\201C" "\201D";line-height:1.7;opacity:0;transition:opacity 1.2s ease;transition-delay:var(--rq,0ms)}
+.slide.on .flag q{opacity:1}
+
+/* ---------- ford quote ---------- */
+#ford{background:radial-gradient(50% 45% at 50% 42%,rgba(158,123,90,.10),transparent 75%),var(--bg);text-align:center;align-items:center}
+#ford .year{font-size:13px;letter-spacing:.5em;color:var(--accent-bright);margin-bottom:36px;font-weight:600}
+#ford blockquote{
+  font-family:var(--serif);font-weight:200;
+  font-size:clamp(26px,4.2vw,52px);line-height:1.5;max-width:21em;margin:0 auto 40px;
+}
+#ford blockquote b{color:var(--accent-bright);font-weight:300}
+#ford .who{font-size:12px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:44px}
+#ford .read{font-size:clamp(15px,1.5vw,18px);color:var(--muted);line-height:2;max-width:38em;margin:0 auto}
+#ford .read b{color:var(--ink);font-weight:600}
+
+/* ---------- timeline 118 ---------- */
+.tl{position:relative;margin:64px 0 56px;height:120px}
+.tl .rail,.tl .rail2{position:absolute;left:0;width:100%;height:1px;background:var(--line)}
+.tl .rail{top:58px}.tl .rail2{top:62px}
+.tl .fill{position:absolute;top:58px;left:0;height:1px;background:var(--accent);width:0;transition:width 2.6s 1.7s cubic-bezier(.22,1,.36,1)}
+.tl .fill2{position:absolute;top:62px;left:0;height:1px;background:var(--accent);opacity:.5;width:0;transition:width 2.6s 1.85s cubic-bezier(.22,1,.36,1)}
+.slide.on .tl .fill,.slide.on .tl .fill2{width:100%}
+.tl .node{position:absolute;top:0;transform:translateX(-50%);text-align:center;width:180px}
+.tl .node .dot{width:7px;height:7px;border:1px solid var(--accent-bright);transform:rotate(45deg);margin:54px auto 0;background:var(--bg)}
+.tl .node .y{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:.06em;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.tl .node .t{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
+.tl .node.hot .y{color:var(--accent-bright)}
+.tl .node.hot .dot{background:var(--accent-bright)}
+.big118{display:flex;align-items:baseline;gap:18px;margin-bottom:10px}
+.big118 .n{font-size:clamp(80px,11vw,150px);font-weight:200;letter-spacing:-.03em;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+.big118 .u{font-size:clamp(16px,2vw,24px);color:var(--accent-bright);font-weight:400}
+
+/* ---------- value chain ---------- */
+.chain{display:flex;align-items:center;gap:0;margin:54px 0 40px;flex-wrap:nowrap}
+.chain .stage{
+  flex:1;border:1px solid var(--line);padding:22px 10px;text-align:center;
+  font-size:clamp(11px,1.2vw,14px);font-weight:500;color:var(--ink);
+  background:var(--surface);position:relative;transition:border-color .6s,color .6s,background .6s;
+  letter-spacing:.04em;
+}
+.chain .stage small{display:block;font-size:10px;letter-spacing:.18em;color:var(--muted);margin-top:7px;text-transform:uppercase}
+.chain .flow{
+  width:clamp(28px,4vw,58px);height:1px;position:relative;flex:none;
+  background:repeating-linear-gradient(90deg,var(--accent) 0 7px,transparent 7px 14px);
+  background-size:28px 1px;animation:flowF 1.1s linear infinite;
+}
+.chain .flow::after{
+  content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  border-left:5px solid var(--accent);border-top:4px solid transparent;border-bottom:4px solid transparent;
+  transition:transform .6s;
+}
+@keyframes flowF{to{background-position:28px 0}}
+@keyframes flowR{to{background-position:-28px 0}}
+.chain.reversed .flow{animation-name:flowR}
+.chain.reversed .flow::after{transform:translateY(-50%) rotate(180deg);right:auto;left:-1px}
+.chain.reversed .stage.design{border-color:var(--accent-bright);background:rgba(158,123,90,.14);color:var(--accent)}
+.chain.reversed .stage.consumer{border-color:var(--copper-dim)}
+.chain .rv{transform:translateY(14px)}
+.flipbtn{
+  display:inline-flex;align-items:center;gap:14px;background:none;border:1px solid var(--accent);
+  color:var(--accent);font-family:var(--sans);font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+  padding:15px 30px;cursor:pointer;transition:background .4s,color .4s;font-weight:600;
+}
+.flipbtn:hover,.flipbtn:focus-visible{background:var(--accent);color:#fff;outline:none}
+.flipnote{font-size:13px;color:var(--muted);margin-top:18px;transition:color .5s}
+.flipnote.lit{color:var(--accent)}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:46px 0}
+.stat{background:var(--surface);padding:34px 26px}
+.stat .v{font-size:clamp(34px,4.6vw,58px);font-weight:200;color:var(--ink);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.stat .v i{font-style:normal;font-size:.45em;color:var(--accent-bright);font-weight:500;margin-left:4px}
+.stat .l{font-size:12.5px;color:var(--muted);line-height:1.7;margin-top:16px}
+.stat.hot .v{color:var(--accent)}
+
+/* ---------- generic blocks ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);align-items:start}
+.panel{border:1px solid var(--line);background:var(--surface);padding:30px 28px}
+.panel h4{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:16px}
+.panel p{font-size:14px;color:var(--muted);line-height:1.9}
+.panel p b{color:var(--ink);font-weight:600}
+.panel.neg h4{color:#B0584A}
+.metaph{border-left:1px solid var(--accent);padding:6px 0 6px 26px;margin-top:38px}
+.metaph .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:12px}
+.metaph p{font-size:15px;color:var(--muted);line-height:1.95;max-width:52em}
+.metaph p b{color:var(--ink);font-weight:600}
+
+/* layers table */
+.layers{width:100%;border-collapse:collapse;margin:40px 0 8px}
+.layers th{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 18px 14px;border-bottom:1px solid var(--line)}
+.layers td{padding:22px 18px;border-bottom:1px solid var(--line);font-size:15px;vertical-align:top}
+.layers td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+.layers td:nth-child(2){color:var(--muted);line-height:1.7}
+.layers td:last-child{color:var(--accent);font-weight:500;white-space:nowrap}
+.layers tr.core td{background:rgba(158,123,90,.09)}
+
+/* attack / defense */
+.duel{display:grid;grid-template-columns:1fr 1.4fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:40px}
+.duel>div{background:var(--surface);padding:30px 28px}
+.duel .atk h4{color:#B0584A}
+.duel h4{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:16px}
+.duel p{font-size:14px;color:var(--muted);line-height:1.9}
+.duel p b{color:var(--ink);font-weight:600}
+.duel .atk p{font-family:var(--serif);font-size:16px;color:var(--ink)}
+
+/* cost curve */
+.curvewrap{margin:44px 0 12px}
+.curvewrap svg{width:100%;height:auto;display:block}
+.curve-path{stroke:var(--accent-bright);stroke-width:1.6;fill:none;stroke-dasharray:1200;stroke-dashoffset:1200;transition:stroke-dashoffset 2.8s 1.2s ease}
+.slide.on .curve-path{stroke-dashoffset:0}
+.curve-fill{fill:url(#cgrad);opacity:0;transition:opacity 1.4s 3.2s}
+.slide.on .curve-fill{opacity:1}
+.curve-label{font-family:var(--sans);font-size:12px;fill:var(--muted)}
+.curve-label.hot{fill:var(--accent);font-weight:600}
+.axis{stroke:var(--line);stroke-width:1}
+
+/* conductor table */
+.shift{width:100%;border-collapse:collapse;margin-top:40px}
+.shift th{font-size:11px;letter-spacing:.26em;text-transform:uppercase;font-weight:600;text-align:left;padding:0 18px 16px;border-bottom:1px solid var(--line)}
+.shift th:nth-child(2){color:var(--muted)}
+.shift th:nth-child(3){color:var(--accent)}
+.shift th:first-child{color:var(--muted)}
+.shift td{padding:19px 18px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.7;vertical-align:top}
+.shift td:first-child{color:var(--muted);font-size:12px;letter-spacing:.1em;white-space:nowrap;padding-top:22px}
+.shift td:nth-child(2){color:var(--muted)}
+.shift td:nth-child(3){color:var(--ink)}
+.shift td:nth-child(3) b{color:var(--accent);font-weight:600}
+.ratio{display:flex;height:5px;margin:42px 0 14px;gap:3px}
+.ratio .r30{width:0;background:var(--accent);transition:width 1.7s 1s cubic-bezier(.22,1,.36,1)}
+.ratio .r70{width:0;background:var(--line);transition:width 1.7s 1s cubic-bezier(.22,1,.36,1)}
+.slide.on .ratio .r30{width:30%}
+.slide.on .ratio .r70{width:70%}
+.ratiolbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);letter-spacing:.08em}
+.ratiolbl b{color:var(--accent);font-weight:600}
+
+/* phases */
+.phase{border:1px solid var(--line);background:var(--surface);padding:32px 30px;position:relative}
+.phase .ph{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:14px}
+.phase h3{font-size:21px;font-weight:600;margin-bottom:18px;color:var(--ink)}
+.phase dl{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:13.5px}
+.phase dt{color:var(--muted);letter-spacing:.06em;white-space:nowrap}
+.phase dd{color:var(--ink);line-height:1.7}
+.phase .key{margin-top:20px;font-size:14px;color:var(--accent);font-weight:500}
+
+/* execution path */
+.path{display:flex;align-items:center;gap:0;margin:48px 0 8px;flex-wrap:nowrap}
+.path .step{flex:1;border:1px solid var(--line);background:var(--surface);padding:26px 18px;text-align:center}
+.path .step .n{font-size:11px;letter-spacing:.3em;color:var(--accent);font-weight:600;margin-bottom:12px;text-transform:uppercase}
+.path .step .t{font-size:15px;font-weight:600;color:var(--ink)}
+.path .step .s{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+.path .joint{width:clamp(20px,3vw,44px);height:1px;background:var(--accent);flex:none;position:relative}
+.path .joint::after{content:"";position:absolute;right:0;top:-3px;border-left:5px solid var(--accent);border-top:3.5px solid transparent;border-bottom:3.5px solid transparent}
+.checks{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:14px 40px}
+.checks div{font-size:13.5px;color:var(--muted);line-height:1.7;padding-left:22px;position:relative}
+.checks div::before{content:"";position:absolute;left:0;top:9px;width:8px;height:1px;background:var(--accent);box-shadow:0 3px 0 var(--copper-dim)}
+.checks div b{color:var(--ink);font-weight:600}
+
+/* flip cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.fcard{perspective:1200px;height:190px;cursor:pointer}
+.fcard .core{position:relative;width:100%;height:100%;transition:transform .8s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.fcard.flip .core{transform:rotateY(180deg)}
+.fcard .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);padding:24px 22px;display:flex;flex-direction:column;gap:12px}
+.fcard .front{background:var(--surface)}
+.fcard .back{background:rgba(158,123,90,.12);border-color:var(--copper-dim);transform:rotateY(180deg)}
+.fcard .tag{font-size:10px;letter-spacing:.3em;text-transform:uppercase;font-weight:600}
+.fcard .front .tag{color:#B0584A}
+.fcard .back .tag{color:var(--accent)}
+.fcard p{font-size:13.5px;line-height:1.7;color:var(--ink)}
+.fcard .back p b{color:var(--accent);font-weight:600}
+.fcard .cue{margin-top:auto;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+
+/* payoff + finale */
+.payoff{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:44px 0}
+.payoff div{background:var(--surface);padding:26px 22px}
+.payoff .k{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:10px}
+.payoff .d{font-size:12.5px;color:var(--muted);line-height:1.7}
+#finale{background:radial-gradient(70% 60% at 50% 115%,rgba(196,154,108,.22),transparent 72%),var(--d-bg);text-align:center;align-items:center}
+#finale .ask{font-size:clamp(24px,3.6vw,44px);font-weight:200;line-height:1.5;max-width:24em;margin:40px auto}
+#finale .ask b{font-weight:500;color:var(--accent-bright)}
+#finale .closing{font-family:var(--serif);font-size:clamp(16px,1.9vw,22px);color:var(--muted);margin-top:46px;line-height:1.9}
+#finale .closing b{color:var(--ink);font-weight:300}
+
+/* ============================================================
+   NEW · NADELLA — two capitals
+   ============================================================ */
+.capital{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;margin:44px 0 8px}
+.capital .cap{border:1px solid var(--line);background:var(--surface);padding:32px 30px}
+.capital .cap .ct{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:10px}
+.capital .cap h4{font-size:22px;font-weight:600;color:var(--ink);margin-bottom:16px}
+.capital .cap p{font-size:14px;color:var(--muted);line-height:1.85}
+.capital .cap p b{color:var(--ink);font-weight:600}
+.capital .cap.token{background:rgba(158,123,90,.08);border-color:var(--copper-dim)}
+.capital .times{display:flex;align-items:center;justify-content:center;width:64px;font-size:40px;font-weight:200;color:var(--accent-bright)}
+.warn-line{margin-top:14px;font-size:13px;color:var(--muted);line-height:1.8}
+.warn-line b{color:#B0584A;font-weight:600}
+
+/* ============================================================
+   NEW · RISK — open vs closed loop toggle (expertise drain)
+   ============================================================ */
+.riskwrap{margin:40px 0 8px}
+.riskbtns{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:4px;gap:4px;margin-bottom:28px}
+.riskbtns button{
+  font-family:var(--sans);font-size:12px;letter-spacing:.06em;font-weight:600;
+  border:none;background:none;color:var(--muted);padding:9px 22px;border-radius:99px;cursor:pointer;transition:all .35s;
+}
+.riskbtns button.on{background:var(--accent);color:#fff}
+.riskbtns button.on.danger{background:#B0584A}
+.riskdiagram{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:0;
+  border:1px solid var(--line);background:var(--surface);padding:36px 30px;
+}
+.riskdiagram .node{text-align:center}
+.riskdiagram .node .nh{font-size:13px;letter-spacing:.1em;font-weight:600;color:var(--ink);margin-bottom:8px}
+.riskdiagram .node .ns{font-size:12px;color:var(--muted);line-height:1.6}
+.riskdiagram .node.brand .nh{color:var(--accent)}
+.riskflow{position:relative;width:clamp(80px,18vw,200px);height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.riskflow .arrow{
+  width:100%;height:2px;position:relative;
+  background:repeating-linear-gradient(90deg,currentColor 0 8px,transparent 8px 16px);
+  background-size:24px 2px;animation:flowF 1.1s linear infinite;color:#B0584A;
+}
+.riskflow .arrow::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-left:6px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.riskflow .albl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#B0584A;text-align:center}
+/* closed mode: flow reverses, returns inward, copper */
+.riskdiagram.closed .riskflow .arrow{color:var(--accent);animation-name:flowR}
+.riskdiagram.closed .riskflow .arrow::after{right:auto;left:-1px;transform:translateY(-50%) rotate(180deg)}
+.riskdiagram.closed .riskflow .albl{color:var(--accent)}
+.riskdiagram.closed .node.ext .nh{color:var(--muted)}
+.riskdiagram.closed .node.brand .nh{color:var(--accent)}
+.riskread{margin-top:24px;font-size:15px;color:var(--muted);line-height:1.9;max-width:50em;min-height:3.4em;transition:color .4s}
+.riskread b{font-weight:600}
+.riskread.danger b{color:#B0584A}
+.riskread.safe b{color:var(--accent)}
+
+/* ============================================================
+   NEW · CLOSED LOOP — interactive centerpiece
+   ============================================================ */
+.loopgrid{display:grid;grid-template-columns:minmax(320px,1fr) 1.05fr;gap:clamp(30px,5vw,70px);align-items:center;margin-top:30px}
+.loopstage{position:relative;width:min(420px,80vw);aspect-ratio:1;margin:0 auto}
+.loopstage svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.loop-ring{fill:none;stroke:var(--line);stroke-width:2}
+.loop-prog{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:var(--circ);stroke-dashoffset:var(--circ);
+  transition:stroke-dashoffset .6s cubic-bezier(.5,0,.2,1);}
+.loopnode{
+  position:absolute;width:118px;height:118px;border-radius:50%;
+  transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px;
+  cursor:pointer;transition:all .4s cubic-bezier(.22,1,.36,1);
+}
+.loopnode .ng{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.loopnode .nk{font-size:17px;font-weight:600;color:var(--ink)}
+.loopnode .ne{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.loopnode:hover{border-color:var(--accent);transform:translate(-50%,-50%) scale(1.05)}
+.loopnode.active{background:var(--accent);border-color:var(--accent);box-shadow:0 14px 36px rgba(154,111,68,.35)}
+.loopnode.active .ng,.loopnode.active .nk,.loopnode.active .ne{color:#fff}
+.loopnode.n1{left:50%;top:0}
+.loopnode.n2{left:100%;top:50%}
+.loopnode.n3{left:50%;top:100%}
+.loopnode.n4{left:0;top:50%}
+.loopcenter{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:150px;
+}
+.loopcenter .ct{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--accent);text-transform:uppercase}
+.loopcenter .cn{font-size:clamp(30px,4vw,46px);font-weight:200;color:var(--ink);line-height:1.1;font-variant-numeric:tabular-nums;margin:4px 0}
+.loopcenter .cl{font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.loopdetail{}
+.loopdetail .dg{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+.loopdetail h3{font-size:clamp(22px,2.6vw,30px);font-weight:600;color:var(--ink);margin-bottom:16px;letter-spacing:-.01em}
+.loopdetail .dp{font-size:15px;color:var(--muted);line-height:1.9;margin-bottom:18px}
+.loopdetail .dp b{color:var(--ink);font-weight:600}
+.loopdetail .dasset{
+  display:inline-flex;align-items:center;gap:10px;font-size:12.5px;color:var(--accent);
+  border:1px solid var(--copper-dim);background:rgba(158,123,90,.07);border-radius:8px;padding:10px 16px;letter-spacing:.02em;
+}
+.loopdetail .dasset b{font-weight:600}
+.loopctl{margin-top:30px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.loopnote{font-size:13px;color:var(--muted);line-height:1.7;max-width:30em}
+.loopnote b{color:var(--accent);font-weight:600}
+
+/* ============================================================
+   NEW · GO APPENDIX (dark register reflective)
+   ============================================================ */
+.golede{font-size:clamp(18px,2.2vw,26px);font-weight:300;line-height:1.7;color:var(--ink);max-width:24em}
+.golede b{color:var(--accent-bright);font-weight:500}
+.gotl{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:44px 0}
+.gotl .go{background:var(--surface);padding:30px 26px}
+.gotl .go .gy{font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--accent-bright);font-weight:500;margin-bottom:14px}
+.gotl .go h4{font-size:17px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.4}
+.gotl .go p{font-size:13.5px;color:var(--muted);line-height:1.8}
+.golessons{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:14px}
+.golesson{border:1px solid var(--line);background:var(--surface);padding:26px 24px;border-radius:2px}
+.golesson .num{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--accent-bright);margin-bottom:14px}
+.golesson p{font-size:14px;color:var(--ink);line-height:1.7;margin-bottom:14px}
+.golesson p b{color:var(--accent-bright);font-weight:600}
+.golesson .map{font-size:12px;color:var(--muted);line-height:1.6;padding-top:14px;border-top:1px solid var(--line)}
+.golesson .map b{color:var(--accent-bright);font-weight:500}
+
+/* loop-stage chip (threads loop through mechanism slides) */
+.lchip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);border:1px solid var(--copper-dim);border-radius:99px;padding:5px 12px;margin-bottom:18px}
+.lchip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* ============================================================
+   NEW · OWNERSHIP THESIS (3 points) + EVIDENCE (3 cards) + ASK
+   ============================================================ */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:44px}
+.three .cell{background:var(--surface);padding:32px 28px;display:flex;flex-direction:column;gap:12px}
+.three .cell .mk{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
+.three .cell.blue .mk{color:var(--blue)}
+.three .cell h3{font-size:19px;font-weight:600;color:var(--ink)}
+.three .cell p{font-size:13.5px;color:var(--muted);line-height:1.8}
+.three .cell p b{color:var(--ink);font-weight:600}
+.evtag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--blue);text-transform:uppercase;margin-bottom:9px}
+.evnote{margin-top:24px;font-size:13px;color:var(--muted);letter-spacing:.02em}
+.evnote b{color:var(--accent);font-weight:600}
+
+/* blue approve button (경영층 승인 CTA) */
+.approvebtn{
+  display:inline-flex;align-items:center;gap:14px;background:var(--blue);border:1px solid var(--blue);
+  color:#15151A;font-family:var(--sans);font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+  padding:16px 34px;cursor:default;font-weight:600;border-radius:4px;
+  box-shadow:0 14px 34px var(--blue-dim);
+}
+
+/* role slide compact ratio reuse handled by .ratio; role panels use .panel */
+.role-blue{border-color:var(--blue-dim)!important;background:var(--blue-dim)!important}
+.role-blue h4{color:var(--blue)!important}
+
+/* loop one-liner lead */
+.loopdetail .dlead{font-size:17px;color:var(--ink);font-weight:600;line-height:1.6;margin-bottom:12px}
+
+/* ================= ANNEX · FIELD EVIDENCE ================= */
+.annex{
+  background:
+    radial-gradient(80% 70% at 20% 100%,rgba(196,154,108,.10),transparent 60%),
+    linear-gradient(155deg,#E9EBF2 0%,#DEE3ED 55%,#E7E3E6 100%);
+  color:#2B3240;
+}
+.annex .paper{
+  position:relative;background:rgba(255,255,255,.62);
+  border:1px dashed #9AA4B8;border-radius:10px;
+  padding:clamp(26px,3.4vw,48px) clamp(22px,3.6vw,54px);
+  box-shadow:0 30px 70px rgba(43,50,64,.14);
+  transform:rotate(-.35deg);
+}
+.annex .tape{
+  position:absolute;top:-15px;left:50%;width:128px;height:30px;
+  background:rgba(168,178,198,.45);border-left:1px solid rgba(255,255,255,.6);border-right:1px solid rgba(255,255,255,.6);
+  transform:translateX(-50%) rotate(-2.2deg);
+  box-shadow:0 2px 6px rgba(43,50,64,.10);
+}
+.annex .rv{transform:translateY(12px)}
+.annex .stamp{
+  display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;color:#A8564A;
+  border:2px solid #A8564A;border-radius:4px;padding:7px 14px;
+  transform:rotate(-3.5deg);opacity:.82;margin-bottom:22px;
+}
+.annex .src{font-family:var(--mono);font-size:10.5px;color:#7C8499;letter-spacing:.04em;margin-bottom:18px}
+.annex h2{font-size:clamp(22px,3vw,34px);font-weight:600;letter-spacing:-.01em;color:#2B3240;margin-bottom:14px}
+.annex h2 b{color:#46618F;font-weight:700}
+.annex .alede{font-size:14.5px;color:#5A6276;line-height:1.85;max-width:50em}
+.annex .alede b{color:#2B3240;font-weight:600}
+.annex .chips{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 0}
+.annex .chips span{font-family:var(--mono);font-size:11px;letter-spacing:.06em;border:1px solid #B6BFD1;border-radius:99px;padding:6px 14px;color:#46618F;background:rgba(255,255,255,.5)}
+.annex .agrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+.annex .acard{background:rgba(255,255,255,.78);border:1px solid #C9D0DE;border-radius:12px;padding:18px 16px;box-shadow:0 10px 24px rgba(43,50,64,.07)}
+.annex .acard .mono{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#46618F;margin-bottom:9px}
+.annex .acard h5{font-size:14px;font-weight:600;color:#2B3240;margin-bottom:9px;line-height:1.45}
+.annex .acard p{font-size:12px;color:#5A6276;line-height:1.7}
+.annex .ab{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:8px 14px;margin-top:26px;align-items:baseline}
+.annex .ab .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:#98A0B3;white-space:nowrap}
+.annex .ab .k.to{color:#46618F}
+.annex .ab .v{font-size:13px;color:#5A6276;line-height:1.65}
+.annex .ab .v.to{color:#2B3240;font-weight:500}
+.annex .sidenote{margin-top:30px;border-left:3px solid #A8564A;padding:4px 0 4px 18px;font-family:var(--serif);font-size:13.5px;color:#6A7286;line-height:1.9;max-width:46em}
+.annex .sidenote b{color:#A8564A;font-weight:300}
+.annex .sidenote .who{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#A8564A;display:block;margin-bottom:6px}
+.annex .ring{position:relative;width:min(330px,68vw);aspect-ratio:1;margin:10px auto}
+.annex .ring .core{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:13px;letter-spacing:.32em;color:#2B3240;font-weight:500;white-space:nowrap}
+.annex .ring .orbit{position:absolute;inset:0;border:1px solid #B6BFD1;border-radius:50%}
+.annex .ring .orbit.o2{inset:11%;border-style:dashed}
+.annex .ring .fn{position:absolute;width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #C9D0DE;box-shadow:0 8px 18px rgba(43,50,64,.10);display:flex;align-items:center;justify-content:center;text-align:center;font-size:9.5px;font-weight:600;letter-spacing:.05em;color:#46618F;line-height:1.3;transform:translate(-50%,-50%)}
+.annex .atl{margin-top:28px;overflow-x:auto;padding-bottom:6px}
+.annex .atl-row{display:flex;align-items:flex-start;gap:0;min-width:680px;margin:18px 0}
+.annex .atl-row .lbl{flex:0 0 64px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:#7C8499;padding-top:2px}
+.annex .atl-row.tobe .lbl{color:#46618F;font-weight:500}
+.annex .atl-row .track{flex:1;display:flex;align-items:flex-start;position:relative}
+.annex .atl-row .track::before{content:"";position:absolute;top:5px;left:0;right:0;height:1px;background:#B6BFD1}
+.annex .atl-row.tobe .track::before{background:#46618F}
+.annex .node2{flex:1;position:relative;padding-top:16px;text-align:center}
+.annex .node2::before{content:"";position:absolute;top:1px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid #98A0B3}
+.annex .atl-row.tobe .node2::before{border-color:#46618F}
+.annex .node2.won::before{background:#5E8C6A;border-color:#5E8C6A}
+.annex .node2 .m{font-family:var(--mono);font-size:9.5px;color:#98A0B3;display:block}
+.annex .atl-row.tobe .node2 .m{color:#46618F}
+.annex .node2 .n{font-size:10.5px;color:#5A6276;line-height:1.4;display:block;margin-top:3px;font-weight:500}
+.annex .node2.won .n{color:#3E6B4C}
+.annex .gain{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:11px;color:#3E6B4C;background:rgba(94,140,106,.12);border:1px dashed #5E8C6A;border-radius:6px;padding:7px 14px;letter-spacing:.06em}
+.annex .thread{margin-top:26px;border:1px solid #C9D0DE;border-radius:12px;background:rgba(255,255,255,.7);padding:20px 22px}
+.annex .thread .line{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.annex .thread .line i{flex:1;height:2px;background:linear-gradient(90deg,#46618F,#B6BFD1);border-radius:2px}
+.annex .thread .line s{width:10px;height:10px;border-radius:50%;background:#46618F;text-decoration:none}
+.annex .thread h6{font-size:14px;font-weight:600;color:#2B3240;margin-bottom:8px}
+.annex .thread p{font-size:12px;color:#5A6276;line-height:1.75}
+
+@media (max-width:880px){
+  .annex .agrid{grid-template-columns:1fr 1fr}
+  .annex .ab{grid-template-columns:auto 1fr}
+}
+@media (max-width:560px){.annex .agrid{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv,.twolines::before,.twolines::after,.flag q{opacity:1;transform:none}
+}
+@media (max-width:980px){
+  #nav{display:none}
+  #brand{left:clamp(24px,4vw,48px)}
+}
+@media (max-width:880px){
+  .slide{padding:72px 22px}
+  .flags,.stats,.cards,.payoff,.cols,.checks,.golessons,.gotl{grid-template-columns:1fr 1fr}
+  .chain{flex-wrap:wrap;gap:10px}
+  .chain .flow{display:none}
+  .chain .stage{flex:1 1 30%}
+  .path{flex-direction:column;align-items:stretch}
+  .path .joint{width:1px;height:22px;margin:0 auto}
+  .path .joint::after{right:-3px;top:auto;bottom:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:5px solid var(--accent);border-bottom:none}
+  .capital{grid-template-columns:1fr}
+  .capital .times{width:auto;height:54px;transform:rotate(90deg)}
+  .loopgrid{grid-template-columns:1fr}
+  .riskdiagram{grid-template-columns:1fr;gap:18px;text-align:center}
+  .riskflow{width:100%;transform:rotate(90deg);margin:10px 0}
+  #hint{display:none}
+}
+@media (max-width:560px){
+  .flags,.stats,.cards,.payoff,.cols,.checks,.golessons,.gotl{grid-template-columns:1fr}
+  .fcard{height:170px}
+  .shift td:first-child,.shift th:first-child{display:none}
+  .loopnode{width:92px;height:92px}
+}
+</style>
+</head>
+<body>
+
+<div id="brand"><span class="mark"></span>PROJECT LOONSHOT</div>
+<div id="counter"><b>01</b> / <span id="total">00</span></div>
+<nav id="nav"></nav>
+<div id="progress"><span class="track"></span><i></i></div>
+<div id="hint"><span class="key">↑ ↓</span> 슬라이드 이동</div>
+
+<main id="deck">
+
+<!-- 00 COVER -->
+<section class="slide dark" id="cover" data-ch="0" data-title="표지">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">Design AI Strategy · 부사장 보고</div>
+    <h1 class="rv head" style="--rd:300ms">PROJECT<br>LOONSHOT</h1>
+    <div class="title-sub rv" style="--rd:1100ms">디자인 판단을, 우리 안에</div>
+    <p class="thesis">
+      <span class="ln rv" style="--rd:1900ms">지금부터 드릴 이야기는 새로운 AI 도구 도입이 아닙니다.</span><br>
+      <span class="ln rv" style="--rd:2900ms">현대차 디자인의 <b>판단</b>을 외부 모델에 내주지 않고,</span><br>
+      <span class="ln rv soft" style="--rd:4000ms">우리 안에서 계속 좋아지는 <b>학습 루프</b>로 남기는 일입니다.</span>
+    </p>
+  </div>
+  <div class="horizon"></div>
+</section>
+
+<!-- ===== SECTION 1 · WHY ===== -->
+
+<!-- 1.0 THESIS (compressed flags) -->
+<section class="slide" data-ch="1" data-title="오늘의 핵심 · 소유권">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">오늘의 핵심 · The Point</div>
+    <h2 class="rv head" style="--rd:250ms">오늘의 핵심은 AI 도입이 아니라,<br>디자인 판단의 <b class="blue">소유권</b>입니다</h2>
+    <p class="lede rv" style="--rd:1000ms">모델은 누구나 빌립니다. 진짜 질문은 현대차 디자인의 판단이 <b>어디에 쌓이느냐</b>입니다 — 우리 안인가, 아니면 외부 모델 안인가.</p>
+    <div class="three">
+      <div class="cell rv" style="--rd:1600ms"><div class="mk">01 · Sovereignty</div><h3>브랜드 주권</h3><p>디자인 정체성은 AI 시대에 가장 <b>대체 불가능한 자산</b>입니다.</p></div>
+      <div class="cell rv" style="--rd:1820ms"><div class="mk">02 · Protection</div><h3>전문성 보호</h3><p>수십 년 쌓인 디자이너의 판단을 <b>외부 모델에 내주지 않습니다.</b></p></div>
+      <div class="cell blue rv" style="--rd:2040ms"><div class="mk">03 · Compounding</div><h3>학습 루프 자산화</h3><p>판단이 쓸수록 <b class="blue">우리 안에 쌓이는 구조</b>를 만듭니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 1.1 FORD (short) -->
+<section class="slide dark" id="ford" data-ch="1" data-title="포드 · 다시 설계할 시점">
+  <div class="inner">
+    <div class="year rv">1908</div>
+    <blockquote>
+      <span class="ln rv" style="--rd:600ms">“고객은 어떤 색이든 고를 수 있습니다.</span><br>
+      <span class="ln rv" style="--rd:1600ms"><b>물론, 검정일 경우에만요.</b>”</span>
+    </blockquote>
+    <div class="who rv" style="--rd:2300ms">Henry Ford · Model T</div>
+    <p class="read rv soft" style="--rd:2900ms">포드 T는 생산 효율을 위해 고객의 선택을 뒤로 미뤘습니다.
+    그 이후 <b>118년</b>, 자동차 산업의 가치는 대부분 <b>제조사 → 고객</b> 한 방향으로만 흘렀습니다.
+    AI 시대에 우리는 처음으로, 고객 신호와 디자인 판단을 <b>앞단으로 되돌릴</b> 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- 1.2 CHAIN = problem -->
+<section class="slide" data-ch="1" data-title="단방향 밸류체인">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">진단 · 문제는 기술이 아니다</div>
+    <h2 class="rv head" style="--rd:250ms">문제는 기술이 아니라 <b>단방향 밸류체인</b>입니다</h2>
+    <p class="lede rv" style="--rd:900ms">118년 동안 이 방향은 한 번도 바뀌지 않았습니다. 디자인은 선택이 시작되는 맨 앞에 있지만, 소비자 신호는 그 앞까지 도달하지 못했습니다.</p>
+    <div class="chain" id="chain1">
+      <div class="stage rv" style="--rd:1100ms">공급자 투자<small>Invest</small></div>
+      <div class="flow rv" style="--rd:1240ms"></div>
+      <div class="stage rv" style="--rd:1380ms">제조<small>Build</small></div>
+      <div class="flow rv" style="--rd:1520ms"></div>
+      <div class="stage design rv" style="--rd:1660ms">디자인 · 개발<small>Design</small></div>
+      <div class="flow rv" style="--rd:1800ms"></div>
+      <div class="stage rv" style="--rd:1940ms">품질 · 마케팅<small>Refine</small></div>
+      <div class="flow rv" style="--rd:2080ms"></div>
+      <div class="stage consumer rv" style="--rd:2220ms">고객 판매<small>Sell</small></div>
+    </div>
+    <div class="cols">
+      <div class="panel rv" style="--rd:2800ms">
+        <h4>단방향의 본질</h4>
+        <p>소비자는 가치사슬의 맨 끝에서 만들어진 것을 받기만 합니다. <b>소비자 신호는 맨 앞까지 도달하지 않았습니다.</b></p>
+      </div>
+      <div class="panel rv" style="--rd:3100ms">
+        <h4>왜 단방향이었을까</h4>
+        <p>당위가 아니라 <b>'정보의 비대칭 비용'에 대한 최적의 전략</b>이었습니다. 신호를 개발 앞단으로 되돌리는 데 너무 큰 비용과 시간이 들었기 때문입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 1.3 INFLECTION -->
+<section class="slide" data-ch="1" data-title="정보비용의 붕괴">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">변곡점 · The Inflection</div>
+    <h2 class="rv head" style="--rd:250ms">정보비용이 무너지면서,<br>처음으로 <b>양방향 구조</b>가 가능해졌습니다</h2>
+    <p class="lede rv" style="--rd:1100ms">단방향을 지탱해 온 핵심 — <b>탐색 · 반복 · 수요 포착</b>의 비용 — 이 AI로 인해 빠르게 낮아지고 있습니다. 그 붕괴는 지금 이 순간에도 가속되고 있습니다.</p>
+    <div class="stats" style="grid-template-columns:repeat(2,1fr)">
+      <div class="stat hot rv" style="--rd:2000ms"><div class="v">3<i>~6개월</i></div><div class="l">LLM 기술 발전 주기. 정보의 획득 · 탐색 · 생성 · 비교 비용이 급격히 낮아지고 있습니다.</div></div>
+      <div class="stat rv" style="--rd:2400ms"><div class="v">양방향<i></i></div><div class="l">소비자 반응이 더 빠르게 수집 · 반영되면서, 디자인은 점점 더 양방향 구조가 가능해집니다.</div></div>
+    </div>
+    <div class="metaph rv soft" style="--rd:3300ms">
+      <div class="tag">질문이 바뀝니다</div>
+      <p>구조는 118년이 그대로이고, 처음으로 그 구조를 바꿀 도구가 왔습니다. 이제 질문이 바뀝니다.
+      <b>'왜 지금인가'에서 '무엇을 해야 하는가'로.</b> 그 답을, 한 외부 신호가 정확히 가리킵니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2 · RISK ===== -->
+
+<!-- 2.0 NADELLA INTERLUDE -->
+<section class="slide dark" data-ch="2" data-title="나델라의 메시지">
+  <div class="inner" style="text-align:center">
+    <div class="eyebrow rv">External Signal · Satya Nadella, Microsoft</div>
+    <blockquote style="font-family:var(--serif);font-weight:200;font-size:clamp(24px,4vw,46px);line-height:1.5;max-width:22em;margin:30px auto 36px">
+      <span class="ln rv" style="--rd:500ms">“일은 떠넘길 수 있어도,</span><br>
+      <span class="ln rv" style="--rd:1700ms"><b style="color:var(--accent-bright);font-weight:300">학습은 절대 떠넘길 수 없다.</b>”</span>
+    </blockquote>
+    <p class="lede rv soft" style="--rd:2800ms;margin:0 auto;text-align:center">
+      나델라가 'AI 시대 기업의 미래'에서 던진 메시지의 핵심은 모델이 아니었습니다.
+      <b>승부는 '가장 좋은 모델'을 고르는 데서 나지 않고, 모델 위에 '학습 루프'를 얹는 데서 난다.</b>
+      어떤 모델이 최고인지는 몇 달이면 또 뒤집히기 때문입니다.</p>
+  </div>
+</section>
+
+<!-- 2.1 NADELLA · '좋아지는 회사' + two capitals -->
+<section class="slide" data-ch="2" data-title="좋아지는 회사 · 두 자본">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">나델라의 메시지 · '좋아지는 회사'</div>
+    <h2 class="rv head" style="--rd:250ms">Nadella가 말한 것은 ‘좋은 모델’이 아니라 <b>‘좋아지는 회사’</b>입니다</h2>
+    <p class="lede rv" style="--rd:950ms">좋은 모델을 고르는 것은 <b>일시적 우위</b>입니다. 몇 달이면 또 뒤집힙니다. 좋은 <b>학습 루프</b>를 만드는 것은 <b>누적 우위</b>입니다. 현대차 디자인의 경쟁력은 개별 결과물이 아니라, <b>판단이 쌓이는 구조</b>에서 나옵니다.</p>
+    <div class="capital">
+      <div class="cap rv" style="--rd:1500ms">
+        <div class="ct">Human Capital</div>
+        <h4>사람 자본</h4>
+        <p>직원의 지식 · 판단 · 관계 · 패턴 인식. 우리에게는 <b>디자이너의 안목과 수십 년의 브랜드 역사</b>입니다.</p>
+      </div>
+      <div class="times rv" style="--rd:1800ms">×</div>
+      <div class="cap token rv" style="--rd:2100ms">
+        <div class="ct">Token Capital</div>
+        <h4>토큰 자본</h4>
+        <p>회사가 <b>직접 만들고 소유하는 AI 능력</b>. 우리에게는 브랜드 자료로 학습된 지능과 그것을 굴리는 워크플로우입니다.</p>
+      </div>
+    </div>
+    <div class="cols" style="margin-top:34px">
+      <div class="panel rv" style="--rd:2700ms">
+        <h4>왜 둘 다여야 하는가</h4>
+        <p>사람 자본 없는 토큰 자본은 <b>방향 없이 도는 연산</b>일 뿐이고, 토큰 자본 없는 사람 자본은 <b>확장되지 못하는 노동</b>일 뿐입니다. 토큰 자본이 커질수록 사람은 밀려나는 게 아니라 <b>운전석으로 올라갑니다.</b></p>
+      </div>
+      <div class="panel rv" style="--rd:3000ms">
+        <h4>진짜 자산은 학습 루프</h4>
+        <p>좋은 AI 회사의 시험은 <b>모델을 갈아끼워도 '회사의 베테랑'이 사라지지 않는가</b>입니다. 모델은 교체돼도, 쓸 때마다 좋아지는 판단의 시스템은 우리 안에 남습니다.</p>
+      </div>
+    </div>
+    <p class="lede rv soft" style="--rd:3700ms;margin-top:30px">디자인에서 이 학습 루프의 이름이 바로 <b>Closed Loop</b>입니다. 다만 그 전에, 이 루프를 만들지 않으면 무엇을 잃는지를 봐야 합니다.</p>
+  </div>
+</section>
+
+<!-- 2.2 RISK toggle -->
+<section class="slide" data-ch="2" data-title="진짜 리스크">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">The Real Risk · 무엇을 잃는가</div>
+    <h2 class="rv head" style="--rd:250ms">진짜 리스크는 AI가 아니라,<br><b>전문성이 외부 모델의 자산</b>이 되는 것입니다</h2>
+    <p class="lede rv" style="--rd:1000ms">나델라의 경고는 명확합니다. 싸워야 할 상대는 경쟁사가 아니라, <b>내 지식을 공짜로 가져가는 모델 그 자체</b>입니다.
+    한 회사가 수십 년 쌓은 판단력도, 모델이 학습하는 순간 누구나 쓰는 범용 상품이 됩니다.</p>
+    <div class="riskwrap rv" style="--rd:1700ms">
+      <div class="riskbtns" role="tablist">
+        <button id="riskOpen" class="on danger" aria-pressed="true">열린 루프 · 그냥 쓰기</button>
+        <button id="riskClosed" aria-pressed="false">닫힌 루프 · 우리가 소유</button>
+      </div>
+      <div class="riskdiagram" id="riskDia">
+        <div class="node brand">
+          <div class="nh">우리 디자인 조직</div>
+          <div class="ns">판단 · 취향 · 수십 년의 안목</div>
+        </div>
+        <div class="riskflow">
+          <div class="albl" id="riskTop">전문성이 빠져나감</div>
+          <div class="arrow"></div>
+          <div class="albl" id="riskBot">→ 외부 모델의 학습 재료</div>
+        </div>
+        <div class="node ext">
+          <div class="nh">외부 범용 모델</div>
+          <div class="ns">누구나 쓰는 범용 상품으로</div>
+        </div>
+      </div>
+      <p class="riskread danger" id="riskRead">상용 AI를 그냥 쓰면 우리의 판단 체계가 <b>외부 플랫폼의 가치로 흡수</b>됩니다. 브랜드의 취향과 디자이너의 안목이 우리의 경쟁력이 아니라, 모델 회사의 자산으로 쌓입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2.3 OWN JUDGMENT SYSTEM (brain → 판단 체계) -->
+<section class="slide" data-ch="2" data-title="엔진이 아니라 판단 체계">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">소유의 대상 · 무엇을 우리 것으로</div>
+    <h2 class="rv head" style="--rd:250ms">엔진이 아니라 <b>판단 체계</b>를 소유합니다</h2>
+    <table class="layers">
+      <thead><tr class="rv soft" style="--rd:900ms"><th>층위</th><th>정의</th><th>성격</th></tr></thead>
+      <tbody>
+        <tr class="rv soft" style="--rd:1200ms"><td>엔진 Engine</td><td>외부 범용 모델 (승인된 것)</td><td>교체 가능</td></tr>
+        <tr class="core rv soft" style="--rd:1650ms"><td>판단 체계 Judgment</td><td>우리 자료로 학습된 브랜드 판단 지능</td><td>영구 자산</td></tr>
+        <tr class="core rv soft" style="--rd:2100ms"><td>생태계 Platform</td><td>엔진을 활용하는 워크플로우 · 인프라</td><td>우리가 만드는 진짜 자산</td></tr>
+      </tbody>
+    </table>
+    <div class="cols" style="margin-top:34px">
+      <div class="panel neg rv" style="--rd:2800ms">
+        <h4>✕ 상용 AI를 그냥 쓰면</h4>
+        <p>우리 데이터와 판단 체계가 외부 플랫폼의 가치로 흡수됩니다. 브랜드의 취향과 디자이너의 판단이 <b>외부 플랫폼의 학습 자산</b>으로 축적되는 구조입니다.</p>
+      </div>
+      <div class="panel rv" style="--rd:3200ms">
+        <h4>○ 우리가 하는 것</h4>
+        <p>데이터는 우리 안에 축적하고, 브랜드 고유의 판단 체계는 내부에서 키웁니다. 엔진은 빌리되, <b>워크플로우와 브랜드 DNA만큼은 반드시 우리 것</b>이어야 합니다.</p>
+      </div>
+    </div>
+    <div class="metaph rv soft" style="--rd:4000ms">
+      <div class="tag">핵심 비유 · 오븐과 레시피</div>
+      <p>범용 LLM은 어디서나 살 수 있는 <b>오븐</b>입니다. 더 좋은 것이 나오면 바꿔 쓰면 됩니다.
+      하지만 오븐이 우리 브랜드의 맛을 만들지는 않습니다. 그 맛을 만드는 것은 수년을 다듬어 온 <b>우리만의 레시피</b>입니다.
+      오븐은 교체해도 됩니다. 레시피는 우리의 금고에 남아 있어야 합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3 · LOOP ===== -->
+
+<!-- 3.0 CLOSED LOOP centerpiece -->
+<section class="slide" data-ch="3" data-title="해결책 · Closed Loop">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">The Solution · 해결책</div>
+    <h2 class="rv head" style="--rd:250ms">해결책은 <b>Closed Loop</b>입니다</h2>
+    <p class="lede rv" style="--rd:900ms">Generate → Select → Validate → Assetize. 그리고 자산화된 학습이 다시 다음 생성을 더 좋게 만듭니다.
+    <b>노드를 눌러 각 단계를 보고, '한 바퀴 돌리기'로 루프가 복리로 쌓이는 걸 확인하세요.</b></p>
+    <div class="loopgrid">
+      <div class="loopstage rv" style="--rd:1500ms">
+        <svg viewBox="0 0 300 300" aria-hidden="true">
+          <circle class="loop-ring" cx="150" cy="150" r="120"></circle>
+          <circle class="loop-prog" id="loopProg" cx="150" cy="150" r="120" transform="rotate(-90 150 150)"></circle>
+        </svg>
+        <button class="loopnode n1 active" data-stage="0"><span class="ng">Generate</span><span class="nk">생성</span><span class="ne">AI 무한 셔터</span></button>
+        <button class="loopnode n2" data-stage="1"><span class="ng">Select</span><span class="nk">선택</span><span class="ne">디자이너 판단</span></button>
+        <button class="loopnode n3" data-stage="2"><span class="ng">Validate</span><span class="nk">검증</span><span class="ne">크로스티켓</span></button>
+        <button class="loopnode n4" data-stage="3"><span class="ng">Assetize</span><span class="nk">자산화</span><span class="ne">판단 체계</span></button>
+        <div class="loopcenter">
+          <div class="ct">축적</div>
+          <div class="cn" id="loopCount">0</div>
+          <div class="cl">바퀴 · 복리로 누적</div>
+        </div>
+      </div>
+      <div class="loopdetail rv" style="--rd:1900ms">
+        <div class="dg" id="lpGloss">STAGE 01 · GENERATE</div>
+        <div class="dlead" id="lpLead">더 많은 가능성을 만든다.</div>
+        <h3 id="lpTitle">생성 — AI가 더 이른 시점에, 더 많은 옵션을</h3>
+        <p class="dp" id="lpDesc">AI는 탐색과 압축의 엔진입니다. 콘크리트를 붓기 전에 수백 개의 방향을 빠르게 펼칩니다. 디자이너는 손이 아니라 <b>의도로 탐색의 폭</b>을 엽니다.</p>
+        <div class="dasset" id="lpAsset">자산 · <b>Key Image · Line-up Overview (AI Design Agent)</b></div>
+        <div class="loopctl">
+          <button class="flipbtn" id="loopRun">한 바퀴 돌리기</button>
+          <p class="loopnote" id="loopNote">한 바퀴 돌 때마다 브랜드 판단이 <b>복리로</b> 쌓입니다. 모델은 교체해도, 이 루프는 우리 안에 남습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3.1 MISCONCEPTIONS (pulled forward) -->
+<section class="slide" data-ch="3" data-title="우리가 주장하지 않는 것">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">경계 명시 · 카드를 눌러 확인</div>
+    <h2 class="rv head" style="--rd:250ms">우리가 주장하지 <b>않는</b> 것</h2>
+    <p class="lede rv" style="--rd:950ms">임원이 떠올릴 반론을 먼저 끊습니다. 카드를 선택하면 사실을 확인합니다.</p>
+    <div class="cards">
+      <div class="fcard rv" style="--rd:1500ms" tabindex="0" role="button" aria-pressed="false">
+        <div class="core">
+          <div class="face front"><span class="tag">오해</span><p>자체 파운데이션 모델을 만들겠다</p><span class="cue">사실 확인 →</span></div>
+          <div class="face back"><span class="tag">사실</span><p>성능 경쟁이 아닙니다. 범용 엔진은 빌리고, <b>생태계와 판단을 소유</b>합니다.</p></div>
+        </div>
+      </div>
+      <div class="fcard rv" style="--rd:1650ms" tabindex="0" role="button" aria-pressed="false">
+        <div class="core">
+          <div class="face front"><span class="tag">오해</span><p>디자인이 IT 인프라를 소유하겠다</p><span class="cue">사실 확인 →</span></div>
+          <div class="face back"><span class="tag">사실</span><p>인프라는 DE센터와 ICT본부. 디자인은 <b>워크플로우 연구와 사용</b>을 맡습니다.</p></div>
+        </div>
+      </div>
+      <div class="fcard rv" style="--rd:1800ms" tabindex="0" role="button" aria-pressed="false">
+        <div class="core">
+          <div class="face front"><span class="tag">오해</span><p>AI로 디자이너를 줄이겠다</p><span class="cue">사실 확인 →</span></div>
+          <div class="face back"><span class="tag">사실</span><p>반복 업무를 덜어내고 본질적인 <b>디자인 판단에 집중</b>하게 합니다.</p></div>
+        </div>
+      </div>
+      <div class="fcard rv" style="--rd:1950ms" tabindex="0" role="button" aria-pressed="false">
+        <div class="core">
+          <div class="face front"><span class="tag">오해</span><p>거대한 투자를 한 번에 해야 한다</p><span class="cue">사실 확인 →</span></div>
+          <div class="face back"><span class="tag">사실</span><p>경량 <b>파일럿으로 검증</b> 후 단계적으로 확산합니다.</p></div>
+        </div>
+      </div>
+    </div>
+    <p class="lede rv soft" style="--rd:2500ms;margin-top:30px">→ 우리가 주장하는 것은 단 하나, <b class="blue">디자인 판단이 우리 안에 쌓이는 구조</b>를 만들자는 것입니다.</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 4 · ROLE ===== -->
+
+<!-- 4.0 ROLE (conductor + loop designer, merged) -->
+<section class="slide" data-ch="4" data-title="우리의 역할">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">우리의 역할 · The Role</div>
+    <h2 class="rv head" style="--rd:250ms">디자이너는 <b>지휘자</b>, 디자인담당은 <b class="blue">학습 루프 설계자</b></h2>
+    <div class="ratio"><span class="r30"></span><span class="r70"></span></div>
+    <div class="ratiolbl rv" style="--rd:1300ms"><span><b>30%</b> 판단 · 의도 · 방향, 디자이너가 집중</span><span>70% 실행 노동, 시스템이 흡수</span></div>
+    <div class="cols" style="margin-top:34px">
+      <div class="panel rv" style="--rd:1800ms">
+        <h4>디자이너 = 지휘자</h4>
+        <p>30%의 판단 · 의도 · 방향에 집중하고, 70%의 반복 실행은 시스템이 흡수합니다. 감축이 아니라 <b>역할의 재구성</b>입니다.
+        음악을 모르는 사람은 지휘할 수 없습니다. AI 시대에 더 중요해지는 것은 <b>더 깊어진 전문성</b>입니다.</p>
+      </div>
+      <div class="panel role-blue rv" style="--rd:2200ms">
+        <h4>디자인담당 = 학습 루프 설계자</h4>
+        <p>생성 · 선택 · 검증 · 자산화가 도는 <b>브랜드 학습 루프</b>를 설계하고 운영합니다. 인프라(DE센터 · ICT본부)와 분업하며, 워룸 안의 실사용과 성과를 책임집니다.
+        그리고 이 구조를 만들려면 <b class="blue">최고 경영층의 승인</b>이 필요합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4.1 EARLY EVIDENCE (compressed) -->
+<section class="slide" data-ch="4" data-title="이미 작은 증거">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">Early Evidence · 이미 시작됐습니다</div>
+    <h2 class="rv head" style="--rd:250ms">선언이 아닙니다. <b>이미 작은 증거</b>가 있습니다</h2>
+    <p class="lede rv" style="--rd:950ms">루프는 개념이 아니라 운영 중입니다. 세 가지만 보여드립니다.</p>
+    <div class="three">
+      <div class="cell rv" style="--rd:1500ms"><div class="evtag">Validate</div><h3>War Room</h3><p>8개 기능이 한 테이블에서 가장 이른 단계에 <b>조기 합의</b>하는 협업 구조.</p></div>
+      <div class="cell rv" style="--rd:1720ms"><div class="evtag">Generate · Assetize</div><h3>Render Smith</h3><p>내부 워크플로우 내재화. <b>4K 15장 / 10분</b>, 100% 자체 개발.</p></div>
+      <div class="cell blue rv" style="--rd:1940ms"><div class="evtag">Result</div><h3>선행 5개월 단축</h3><p>도구가 아니라 마일스톤을 다시 그린 결과. <b class="blue">달력으로 보이는 구조 혁신.</b></p></div>
+    </div>
+    <p class="evnote rv" style="--rd:2400ms">→ 상세 현장 기록(War Room · AI Design Agent · RenderSmith · 5개월 타임라인)은 <b>부록(Appendix)</b>에 있습니다.</p>
+  </div>
+</section>
+
+<!-- ===== SECTION 5 · ASK ===== -->
+
+<!-- 5.0 PILOT execution + approval -->
+<section class="slide" data-ch="5" data-title="파일럿 실행 구조">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">실행 구조 · 작게 시작한다</div>
+    <h2 class="rv head" style="--rd:250ms">파일럿 실행 구조와 <b class="blue">승인 요청</b></h2>
+    <div class="path">
+      <div class="step rv" style="--rd:1100ms"><div class="n">Design AI</div><div class="t">도구</div><div class="s">새 프로세스를 가능하게 하는 수단</div></div>
+      <div class="joint rv soft" style="--rd:1500ms"></div>
+      <div class="step rv" style="--rd:1700ms"><div class="n">Next-Gen Process</div><div class="t">개발프로세스 혁신</div><div class="s">빠진 연결고리, 혁신의 진짜 대상</div></div>
+      <div class="joint rv soft" style="--rd:2100ms"></div>
+      <div class="step rv" style="--rd:2300ms"><div class="n">Manufacturing</div><div class="t">제조 혁신</div><div class="s">프로세스가 자리 잡을 때 현실이 되는 성과</div></div>
+    </div>
+    <div class="cols" style="margin-top:40px">
+      <div class="panel rv" style="--rd:3000ms">
+        <h4>혼자가 아닙니다 · 역할 분담</h4>
+        <p>엔터프라이즈급 AI 인프라(호스팅 · 학습 · 데이터 파이프라인 · 보안)는 <b>DE센터와 ICT본부</b>의 전사 공통 영역입니다.
+        디자인은 워룸 안의 <b>워크플로우 · 에이전트 조합 · 크로스티켓</b>, 즉 실사용과 성과를 맡습니다. 본부장 차원의 사전 긍정 신호는 확보되어 있습니다.</p>
+      </div>
+      <div class="panel role-blue rv" style="--rd:3300ms">
+        <h4>주행 시험장 · Proving Ground</h4>
+        <p>자동차는 검증 없이 양산하지 않습니다. 시험장에서 달리고, 데이터를 모으고, 안전을 확인한 뒤 양산합니다.
+        파일럿의 목적은 <b>반복 가능한 프로세스 템플릿, Lessons Learned, 조직의 신뢰</b>, 그리고 <b class="blue">확산 권한</b>입니다.</p>
+      </div>
+    </div>
+    <div class="checks">
+      <div class="rv" style="--rd:4000ms"><b>① 앞단 프로젝트</b> · 제품개발 단계가 명확히 앞단에 있는 신규/리프레시</div>
+      <div class="rv" style="--rd:4150ms"><b>② 적정 복잡도</b> · 크로스티켓이 실제로 필요한 수준</div>
+      <div class="rv" style="--rd:4300ms"><b>③ 블라인드 평가</b> · 결과를 객관 평가할 판단 라인</div>
+      <div class="rv" style="--rd:4450ms"><b>④ Go/No-Go</b> · 일정 내 검증 창과 맞물릴 것</div>
+      <div class="rv" style="--rd:4600ms"><b>⑤ 제한된 리스크</b> · 실패해도 전사 리스크가 제한적</div>
+      <div class="rv" style="--rd:4750ms"><b>설계 기준</b> · 파일럿은 처음부터 전사 확산 가능성을 기준으로 설계</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5.1 FINALE -->
+<section class="slide dark" id="finale" data-ch="5" data-title="단 하나의 요청">
+  <div class="inner">
+    <span class="twolines" style="margin:0 auto 40px;width:96px;height:9px"></span>
+    <div class="eyebrow ask-eye rv">마지막 한 문장 · The Ask</div>
+    <p class="ask">
+      <span class="ln rv" style="--rd:700ms">118년 전, 포드는 컨베이어 벨트로 세상을 바꿨습니다.</span><br>
+      <span class="ln rv" style="--rd:1800ms">우리는 지금, 같은 크기의 변화를 <b>반대 방향</b>으로 시작합니다.</span>
+    </p>
+    <p class="lede rv" style="--rd:2900ms;margin:0 auto;text-align:center">디자인 AI를 만들자는 것이 아닙니다. 현대차 디자인의 판단이 우리 안에서 계속 좋아지는 <b>학습 루프 구조</b>를 만들자는 것입니다.
+    거창한 선언은 필요 없습니다. 작게 시작할 첫 파일럿이면 충분합니다. 다만 그 구조를 만들려면 <b class="blue">최고 경영층의 승인</b>이 필요합니다.</p>
+    <div class="approvebtn rv" style="--rd:4300ms">첫 시험 비행을 승인해 주십시오</div>
+    <p class="closing rv soft" style="--rd:5400ms">“엔진은 빌리되, 판단은 우리 안에.<br><b>현대차 디자인의 학습 루프를, 우리 손으로.</b>”</p>
+  </div>
+</section>
+
+<!-- ===== APPENDIX · 부록 ===== -->
+
+<!-- A.0 APPENDIX DIVIDER -->
+<section class="slide dark act" data-ch="a" data-title="Appendix · 부록">
+  <div class="gmatrix"></div>
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="actnum rv">Appendix · 부록</div>
+    <h1 class="rv head" style="--rd:300ms">근거와 배경 자료</h1>
+    <p class="sub">
+      <span class="ln rv" style="--rd:1300ms">본편에서 압축한 <b>현장 기록과 상세 분석</b>,</span><br>
+      <span class="ln rv" style="--rd:2100ms">그리고 <b>바둑계가 먼저 보여준 교훈</b>을 모았습니다.</span><br>
+      <span class="ln rv" style="--rd:2800ms">질문이 나오면 이 자리에서 펼칩니다.</span>
+    </p>
+  </div>
+</section>
+
+<!-- A.1 FOUR FLAGS (full, preserved) -->
+<section class="slide" data-ch="a" data-title="부록 · 네 개의 깃발">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">The Cause · 네 개의 깃발 (원본 보존)</div>
+    <h2 class="rv head" style="--rd:250ms">회장이 직접 내걸 수 있는 명분</h2>
+    <p class="lede rv" style="--rd:1000ms">기술 도입의 논리가 아니라, 브랜드와 사람에 관한 선언입니다. (본편에서는 '소유권' 한 장으로 압축했습니다.)</p>
+    <div class="flags">
+      <div class="flag rv" style="--rd:1700ms">
+        <span class="no">01</span>
+        <h3>브랜드 주권<span>Brand Sovereignty</span></h3>
+        <p>AI 시대에 가장 값지고 대체 불가능한 자산은 브랜드의 정체성입니다. 디자이너의 판단, 디자인 취향, 수십 년의 역사. 상용 AI에 창의를 맡기는 순간 브랜드의 영혼이 그들의 학습 재료로 흡수됩니다.</p>
+        <q style="--rq:2600ms">엔진을 빌리되, 영혼은 우리가 키운다.</q>
+      </div>
+      <div class="flag rv" style="--rd:1950ms">
+        <span class="no">02</span>
+        <h3>변형 또는 도태<span>Metamorphosis or Extinction</span></h3>
+        <p>AI는 우리가 무엇을 하든 디자인이 일하는 방식을 바꿉니다. 더 높은 형태로 변화하거나, 변화하는 이들에게 대체되거나. 이것은 점진적 성장이 아니라 생존의 경로입니다.</p>
+        <q style="--rq:2850ms">변형할 것인가, 도태될 것인가. 통제하는 자만이 진화한다.</q>
+      </div>
+      <div class="flag rv" style="--rd:2200ms">
+        <span class="no">03</span>
+        <h3>이끌거나 끌리거나<span>Dragged or Driving</span></h3>
+        <p>폭풍은 이미 왔고 우리는 선택해야 합니다. 폭풍에 휘말려 끌려다니며 종속될 것인가, 방향키를 쥐고 우리의 길을 개척할 것인가.</p>
+        <q style="--rq:3100ms">이미 온 혁명이다. 끌려갈 것인가, 방향을 잡을 것인가.</q>
+      </div>
+      <div class="flag rv" style="--rd:2450ms">
+        <span class="no">04</span>
+        <h3>사람을 높이는 혁신<span>Innovation That Elevates</span></h3>
+        <p>감원을 위한 자동화가 아닙니다. 디자이너를 집행자에서 창작자로 격상시키고, 인간의 판단을 보존하고 증폭하며, 머릿속에 갇힌 아이디어를 우리의 자산으로 만드는 혁신입니다.</p>
+        <q style="--rq:3350ms">기계가 사람을 대체하는 혁신이 아니라, 사람을 거장으로 만드는 혁신.</q>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.2 118 YEARS + GAP -->
+<section class="slide" data-ch="a" data-title="부록 · 118년과 대격차">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">History · 1908 → 2026</div>
+    <div class="big118 rv head" style="--rd:300ms"><span class="n" data-count="118" data-dur="2200">0</span><span class="u">년, 가치 흐름의 방향 불변</span></div>
+    <p class="lede rv" style="--rd:1100ms">강철은 알루미늄과 탄소섬유로, 엔진은 전기모터로 바뀌었지만, 제조업체에서 소비자로 흐르는 가치의 단방향성은 단 한 번도 바뀌지 못했습니다.</p>
+    <div class="tl">
+      <span class="rail"></span><span class="rail2"></span>
+      <span class="fill"></span><span class="fill2"></span>
+      <div class="node rv" style="left:6%;--rd:1900ms">
+        <div class="y">1908</div><div class="dot"></div>
+        <div class="t">Ford Model T<br>단방향 구조의 탄생</div>
+      </div>
+      <div class="node rv" style="left:50%;--rd:2900ms">
+        <div class="y">1985</div><div class="dot"></div>
+        <div class="t">Porter, 단방향<br>밸류체인 이론화</div>
+      </div>
+      <div class="node hot rv" style="left:94%;--rd:3900ms">
+        <div class="y">2026</div><div class="dot"></div>
+        <div class="t">처음으로 방향을<br>바꿀 수 있는 해</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat hot rv" style="--rd:4400ms"><div class="v" data-count="2">0<i>~4년</i></div><div class="l">신흥 OEM 신차<br>모델 세대 교체 주기</div></div>
+      <div class="stat rv" style="--rd:4600ms"><div class="v" data-count="4">0<i>~5년</i></div><div class="l">레거시 OEM<br>모델 세대 교체 주기</div></div>
+      <div class="stat hot rv" style="--rd:4800ms"><div class="v" data-count="20">0<i>%</i></div><div class="l">신흥 OEM의<br>전 세계 차량 생산 점유</div></div>
+      <div class="stat rv" style="--rd:5000ms"><div class="v" data-count="1.5">0<i>년</i></div><div class="l">신흥 OEM 플랫폼 개발 주기<br>레거시는 4.5년</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- A.3 OWNERSHIP FLIP (secondary interaction) -->
+<section class="slide" data-ch="a" data-title="부록 · 방향을 뒤집다">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">보조 인터랙션 · 흐름을 되돌리다</div>
+    <h2 class="rv head" style="--rd:250ms">밸류체인의 <b>소유 지점</b>을 옮깁니다</h2>
+    <p class="lede rv" style="--rd:1000ms">포드가 '만드는 방식(HOW)'을 바꿨다면, 우리는 '가치가 시작되는 곳(WHERE)'을 바꿉니다. 소비자 신호가 사후 반응이 아니라 <b>설계의 입력값</b>이 되는 구조.</p>
+    <div class="chain" id="chain2">
+      <div class="stage rv" style="--rd:1900ms">공급자 투자<small>Invest</small></div>
+      <div class="flow rv" style="--rd:2040ms"></div>
+      <div class="stage rv" style="--rd:2180ms">제조<small>Build</small></div>
+      <div class="flow rv" style="--rd:2320ms"></div>
+      <div class="stage design rv" style="--rd:2460ms">디자인 · 개발<small>Design</small></div>
+      <div class="flow rv" style="--rd:2600ms"></div>
+      <div class="stage rv" style="--rd:2740ms">품질 · 마케팅<small>Refine</small></div>
+      <div class="flow rv" style="--rd:2880ms"></div>
+      <div class="stage consumer rv" style="--rd:3020ms">고객<small>Signal</small></div>
+    </div>
+    <button class="flipbtn rv" style="--rd:3700ms" id="flipBtn" aria-pressed="false">방향을 뒤집다</button>
+    <p class="flipnote rv soft" style="--rd:4100ms" id="flipNote">단방향을 완성한 혁명에서, 단방향을 뒤집는 혁명으로.</p>
+  </div>
+</section>
+
+<!-- A.4 MOAT -->
+<section class="slide" data-ch="a" data-title="부록 · 생태계를 소유한다">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">지속 가능한 경쟁 우위</div>
+    <h2 class="rv head" style="--rd:250ms">엔진보다, 엔진이 꽂히는 <b>생태계</b>를 소유합니다</h2>
+    <p class="lede rv" style="--rd:1000ms">지켜야 할 것은 엔진이 연결되는 <b>워크플로우와 그 안에 축적되는 브랜드 판단</b>입니다. 더 좋은 엔진이 나오면 엔진만 바꾸면 됩니다.</p>
+    <div class="metaph rv soft" style="--rd:1900ms">
+      <div class="tag">자동차 업계의 같은 전략</div>
+      <p>모듈러 플랫폼 안에 내연기관 · 하이브리드 · 전기 파워트레인을 넣는 전략과 같습니다.
+      플랫폼(아키텍처)이 오래가는 전략 자산이고, 파워트레인은 업그레이드되는 부품입니다.
+      <b>엔진(LLM)은 파워트레인, 디자인 AI 생태계는 플랫폼</b>입니다.</p>
+    </div>
+    <div class="duel">
+      <div class="atk rv" style="--rd:2900ms"><h4>예상 공격</h4><p>“엔진이 공짜로 좋아진다면, 기다렸다 쓰면 되지 왜 지금 만들어야 하는가?”</p></div>
+      <div class="rv" style="--rd:3700ms"><h4>방어</h4><p>엔진은 기다리면 좋아집니다. 하지만 <b>워크플로우와 브랜드 판단은 기다린다고 생기지 않습니다.</b>
+      지금 만들지 않으면, 더 좋은 엔진이 나와도 우리는 여전히 <b>툴을 사용하는 쪽</b>에 머물게 됩니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- A.5 SUPPORTS (받침대 · 거버넌스) -->
+<section class="slide" data-ch="a" data-title="부록 · 받침대와 거버넌스">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">자동 품질 향상 · 거버넌스</div>
+    <h2 class="rv head" style="--rd:250ms">받침대가 견고하면, <b>연장이 좋아질수록</b><br>결과도 함께 좋아집니다</h2>
+    <div class="cols">
+      <div class="panel rv" style="--rd:1100ms">
+        <h4>받침대와 연장</h4>
+        <p>워크플로우는 <b>받침대</b>, 엔진은 <b>연장</b>입니다. 받침대가 견고하면 더 좋은 연장을 끼우는 것만으로 결과가 자동으로 좋아집니다.
+        그래서 워크플로우를 구축할 적기는 <b>연장이 빠르게 좋아지고 있는 바로 지금</b>입니다.</p>
+      </div>
+      <div class="panel rv" style="--rd:1600ms">
+        <h4>거버넌스 · 데이터 주권</h4>
+        <p>엔진 교체의 자유는 넓게 열되, <b>검증 · 승인된 오픈소스, 학습 비사용 보장 API, 공식 사내 배포</b>로만 안착됩니다.
+        부품 호몰로게이션과 같습니다. 아무 엔진이나 설치하지 않습니다.</p>
+      </div>
+    </div>
+    <div class="duel">
+      <div class="atk rv" style="--rd:2500ms"><h4>예상 공격</h4><p>“승인 절차가 곧 족쇄다.”</p></div>
+      <div class="rv" style="--rd:3200ms"><h4>방어</h4><p>거버넌스는 제약이 아니라 <b>빠른 차선</b>으로 설계합니다. 사전 검증된 기준 위에서 빠르게 통과하는 패스트트랙 — 족쇄가 아니라 <b>고속도로</b>입니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- A.6 CONDUCTOR (full table) -->
+<section class="slide" data-ch="a" data-title="부록 · 3:7 지휘자 상세">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">일하는 방식의 변화 · 3:7 원칙</div>
+    <h2 class="rv head" style="--rd:250ms">연주자에서 <b>지휘자</b>로 · 상세</h2>
+    <table class="shift">
+      <thead><tr class="rv soft" style="--rd:2100ms"><th></th><th>과거 · 장인 모델</th><th>전환 후 · 지휘자 모델</th></tr></thead>
+      <tbody>
+        <tr class="rv soft" style="--rd:2400ms"><td>역할</td><td>유일한 실행자, 모든 것을 직접 실행</td><td><b>지휘자.</b> 에이전트 조합을 설계 · 지휘</td></tr>
+        <tr class="rv soft" style="--rd:2650ms"><td>탐색</td><td>한 번에 한 선(線), 직렬</td><td>수백 방향을 <b>병렬 탐색</b></td></tr>
+        <tr class="rv soft" style="--rd:2900ms"><td>판단의 운명</td><td>머릿속에 갇혀 사멸</td><td>기록되어 <b>자산화</b> (Action Log · Intent Package)</td></tr>
+        <tr class="rv soft" style="--rd:3150ms"><td>창의성</td><td>손과 눈만 단련</td><td>방대한 선택지를 <b>브랜드 의도로 필터링 · 조화</b></td></tr>
+      </tbody>
+    </table>
+    <div class="duel" style="margin-top:34px">
+      <div class="atk rv" style="--rd:3900ms"><h4>가장 위험한 공격</h4><p>“시스템이 70%를 한다면, 결국 사람은 줄어드는 것 아닌가?”</p></div>
+      <div class="rv" style="--rd:4700ms"><h4>방어</h4><p>AI가 흡수하는 70%는 반복적 실행 · 수정 · 변형 · 정리의 노동입니다. 디자이너가 지키는 30%는
+      방향을 정하고, 해석하고, 선택하며, 책임지는 <b>고부가가치 판단</b>입니다. 결과는 감축이 아니라 <b>역할의 재구성</b>입니다.
+      그리고 음악을 모르는 사람은 지휘할 수 없습니다. AI 시대에 더 중요해지는 것은 <b>더 깊어진 전문성</b>입니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- A.7 CROSS-TICKET curve -->
+<section class="slide" data-ch="a" data-title="부록 · 변경비용 곡선">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">크로스티켓 · 변경비용 곡선</div>
+    <h2 class="rv head" style="--rd:250ms">가장 이른 단계에서, 가장 많이 검토하고,<br><b>가장 많이 합의합니다</b></h2>
+    <div class="cols">
+      <div>
+        <div class="curvewrap rv" style="--rd:1000ms">
+          <svg viewBox="0 0 520 270" role="img" aria-label="개발 단계가 뒤로 갈수록 기하급수적으로 커지는 변경 비용 곡선">
+            <defs>
+              <linearGradient id="cgrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#9E7B5A" stop-opacity=".25"/>
+                <stop offset="1" stop-color="#9E7B5A" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line class="axis" x1="40" y1="230" x2="500" y2="230"/>
+            <line class="axis" x1="40" y1="20" x2="40" y2="230"/>
+            <path class="curve-fill" d="M40,226 C200,222 330,200 420,130 C460,95 485,55 495,30 L495,230 L40,230 Z"/>
+            <path class="curve-path" d="M40,226 C200,222 330,200 420,130 C460,95 485,55 495,30"/>
+            <circle cx="70" cy="225" r="3.5" fill="#C49A6C"/>
+            <circle cx="300" cy="207" r="3.5" fill="#8F8B84"/>
+            <circle cx="480" cy="44" r="3.5" fill="#A05B4E"/>
+            <text class="curve-label hot" x="70" y="252" text-anchor="middle">컨셉</text>
+            <text class="curve-label" x="300" y="252" text-anchor="middle">설계 · 개발</text>
+            <text class="curve-label" x="478" y="252" text-anchor="middle">금형</text>
+            <text class="curve-label" x="46" y="16">변경 비용</text>
+          </svg>
+        </div>
+        <div class="stats" style="grid-template-columns:repeat(3,1fr);margin:18px 0 0">
+          <div class="stat rv" style="--rd:2800ms"><div class="v">70<i>%+</i></div><div class="l">제품 개발 비용 대부분은 디자인 단계에서 사실상 결정</div></div>
+          <div class="stat rv" style="--rd:3100ms"><div class="v">10<i>배</i></div><div class="l">단계가 뒤로 갈수록 기하급수적으로 커지는 변경 비용</div></div>
+          <div class="stat hot rv" style="--rd:3400ms"><div class="v">수천<i>배</i></div><div class="l">금형 단계의 변경 비용, 컨셉 단계 대비</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel rv" style="--rd:1400ms">
+          <h4>WHY · 설계와 콘크리트</h4>
+          <p>도면 위에서는 벽 하나를 옮기는 데 지우개면 충분합니다. 콘크리트를 부은 뒤에는 착암기와 덤프트럭이 필요합니다.
+          AI는 <b>콘크리트를 붓기 전에</b> 수백 개의 평면도를 빠르게 검토하고 비교하게 합니다.</p>
+        </div>
+        <div class="panel rv" style="--rd:2100ms">
+          <h4>HOW · 크로스티켓</h4>
+          <p>재무 · 권역 · 상품 · PM · 구매 · 품질 · 설계가 짧은 패스를 빠르게 주고받으며 함께 공간을 읽습니다.
+          디자인은 가장 일찍 신호를 받고 가장 자주 볼을 배급하는 <b>플레이메이커</b>가 됩니다.</p>
+        </div>
+        <div class="panel rv" style="--rd:2800ms">
+          <h4>OEM의 가장 큰 갈등과 방어</h4>
+          <p>“그림은 만들 수 있다. 하지만 생산은 안 된다.” 우리의 구조에서는 엔지니어링 · 구매 · 품질의 제약이 <b>초기 탐색의 입력값</b>으로 들어옵니다.
+          제약을 더 일찍 받아들여, 뒤늦은 반려와 재작업 비용을 줄입니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.8 WAR ROOM -->
+<section class="slide annex" data-ch="a" data-title="현장기록 · War Room">
+  <div class="inner">
+    <div class="paper">
+      <span class="tape"></span>
+      <div class="stamp rv">현장 기록 01 · Field Evidence</div>
+      <div class="src rv" style="--rd:200ms">출처: Innovation in the Design Development Process · Hyundai Design Center, Design Program Dept.</div>
+      <h2 class="rv" style="--rd:400ms">크로스티켓에는 이미 실물이 있습니다. <b>WAR ROOM</b></h2>
+      <p class="alede rv" style="--rd:800ms">앞 장의 '짧은 패스'는 은유가 아니라 운영 중인 협업체의 이름입니다.
+      여덟 개 기능이 하나의 원탁에 동시 착석해 <b>"다음에 어떤 차를 개발해야 하는가"</b>를 가장 이른 단계에서 함께 묻습니다.
+      디자인은 그 질문에 가장 먼저 형상을 공급하는 자리에 있습니다.</p>
+      <div class="cols" style="margin-top:18px;align-items:center">
+        <div class="ring rv" style="--rd:1300ms">
+          <span class="orbit"></span><span class="orbit o2"></span>
+          <span class="core">WAR ROOM</span>
+          <span class="fn" style="left:50%;top:5%">PM</span>
+          <span class="fn" style="left:82%;top:18%">QUALITY</span>
+          <span class="fn" style="left:95%;top:50%">REGIONAL HQ</span>
+          <span class="fn" style="left:82%;top:82%">PROCURE-MENT</span>
+          <span class="fn" style="left:50%;top:95%">DESIGN</span>
+          <span class="fn" style="left:18%;top:82%">ENGINEER-ING</span>
+          <span class="fn" style="left:5%;top:50%">PRODUCT</span>
+          <span class="fn" style="left:18%;top:18%">MANUFAC-TURING</span>
+        </div>
+        <div>
+          <div class="ab rv" style="--rd:1800ms">
+            <span class="k">묻는 질문</span><span class="v to">What kind of vehicle should we develop next?</span>
+            <span class="k to">디자인의 답</span><span class="v to">What can design drive from the start?</span>
+          </div>
+          <div class="chips rv" style="--rd:2200ms">
+            <span>8 Functions</span><span>동시 착석</span><span>선행 단계 합의</span>
+          </div>
+        </div>
+      </div>
+      <div class="sidenote rv" style="--rd:2700ms">
+        <span class="who">Loonshots 주석</span>
+        Bahcall이라면 이 원을 <b>dynamic equilibrium</b>이라 부를 것입니다.
+        루온샷 그룹(디자인 AI)과 프랜차이즈 그룹(설계 · 구매 · 품질 · 생산)을 분리하되,
+        둘이 만나는 접촉면을 우연이 아니라 구조로 설계한 것. 1940년 Vannevar Bush의 OSRD가 했던 일과 같습니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.9 AI DESIGN AGENT -->
+<section class="slide annex" data-ch="a" data-title="현장기록 · AI Design Agent">
+  <div class="inner">
+    <div class="paper">
+      <span class="tape"></span>
+      <div class="stamp rv">현장 기록 02 · Field Evidence</div>
+      <div class="src rv" style="--rd:200ms">출처: AI Design Agent · Internally Integrated Workflow Study Results</div>
+      <h2 class="rv" style="--rd:400ms">'무한 셔터'의 실물. <b>네 개의 내재화 워크플로우</b></h2>
+      <p class="alede rv" style="--rd:800ms">ComfyUI · Copilot · Gemini의 인트라넷 내재화 위에서 LoRA 학습, Key Image 생성,
+      3D 자동생성, 영상 제작이 스터디 단계를 마쳤습니다. 탐색은 이미 도구가 아니라 <b>프로세스 초안</b>으로 존재합니다.</p>
+      <div class="agrid">
+        <div class="acard rv" style="--rd:1300ms"><div class="mono">Generate Idea</div><h5>Key Image · Key Concept</h5><p>권역 · 상품별 차량 디자인의 빠른 생성. 신속한 의사결정의 출발점.</p></div>
+        <div class="acard rv" style="--rd:1480ms"><div class="mono">Generate Overview</div><h5>Line-up Overview</h5><p>라인업 단위 제안. 권역별 상품 제안으로 확장 가능.</p></div>
+        <div class="acard rv" style="--rd:1660ms"><div class="mono">Generate 3D Data</div><h5>Multi-View · Quick 3D</h5><p>초기 패키지 레이아웃의 데이터 기반 확인. 공력 · 구조 정합성 조기 검토.</p></div>
+        <div class="acard rv" style="--rd:1840ms"><div class="mono">Generate Scenario</div><h5>AI-Driven Scenario</h5><p>AVP 등 신기술 적용 시나리오 영상. 권역 환경 기반 상품성 조기 점검.</p></div>
+      </div>
+      <div class="ab rv" style="--rd:2400ms">
+        <span class="k">As-is</span><span class="v">추상적 소통 · 순차적 검토 · 높은 불확실성</span>
+        <span class="k to">To-be</span><span class="v to">실체적 소통 · 양방향 검토 · 선행 단계 사전검증</span>
+      </div>
+      <div class="chips rv" style="--rd:2800ms">
+        <span>Tangibility 실체화</span><span>Certainty 확실성</span><span>Integration-Connection 통합과 연결</span>
+      </div>
+      <div class="sidenote rv" style="--rd:3300ms">
+        <span class="who">Loonshots 주석</span>
+        루온샷은 기술이 부족해서 죽지 않습니다. 아티스트와 솔저 사이의 <b>전달(transfer)</b>에서 죽습니다.
+        고해상도 이미지, 3D, 영상은 곧 전달 매체의 혁신입니다. 텍스트와 구두 설명이 잃어버리던 것을 형상이 보존합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.10 RENDERSMITH thread -->
+<section class="slide annex" data-ch="a" data-title="현장기록 · One Digital Thread">
+  <div class="inner">
+    <div class="paper">
+      <span class="tape"></span>
+      <div class="stamp rv">현장 기록 03 · Field Evidence</div>
+      <div class="src rv" style="--rd:200ms">출처: RenderSmith · Visualization Management Solution / CMF Integrated Management</div>
+      <h2 class="rv" style="--rd:400ms">'마스터 프린트'의 실물. <b>RenderSmith와 하나의 데이터</b></h2>
+      <p class="alede rv" style="--rd:800ms">언리얼 엔진 기반 웹 렌더 시스템 위에서 컬러 사양서(CPL/CCC)가 자동화되고,
+      디자인 데이터가 컨피규레이터를 거쳐 소비자까지 끊기지 않고 흐릅니다.
+      파편화된 엑셀과 수작업 사양서가 만들던 왜곡 · 휴먼에러 · 리워크의 사슬을 데이터 하나로 대체합니다.</p>
+      <div class="agrid">
+        <div class="acard rv" style="--rd:1300ms"><div class="mono">Digitalization</div><h5>컬러 · 재질의 디지털화</h5><p>CCN 코드 체계와 재질 DB. 마스터 샘플 기준의 디지털 재질 자산화.</p></div>
+        <div class="acard rv" style="--rd:1480ms"><div class="mono">Evaluation</div><h5>디지털 컬러 품평</h5><p>PLM CAD 데이터 기반 정합도 향상. 피지컬 모델 비용 · 기간 절감.</p></div>
+        <div class="acard rv" style="--rd:1660ms"><div class="mono">Automation</div><h5>사양서 자동화</h5><p>이미지 포함 컬러 사양서. 해석 오류와 휴먼에러 리스크 감소.</p></div>
+        <div class="acard rv" style="--rd:1840ms"><div class="mono">Production</div><h5>통합 콘텐츠 제작</h5><p>디자인 데이터 그대로 실차 동일 컬러의 마케팅 콘텐츠 즉각 생성.</p></div>
+      </div>
+      <div class="thread rv" style="--rd:2500ms">
+        <div class="line"><s></s><i></i><s></s></div>
+        <h6>One Digital Thread, From Development to End-User</h6>
+        <p>워룸 → 품평 → DSO → 데이터 릴리즈 → 컬러 품평을 지나 Customer · Management · R&D · AVP · ICT ·
+        Marketing · Sales · Manufacturing · Service까지, 디자이너의 최초 의도가 왜곡 없이 도달합니다.</p>
+      </div>
+      <div class="chips rv" style="--rd:2900ms">
+        <span>Single Source</span><span>Shift-Left</span><span>Consistency</span>
+      </div>
+      <div class="sidenote rv" style="--rd:3400ms">
+        <span class="who">Loonshots 주석</span>
+        이 실은 본편의 테제, <b>양방향 흐름의 인프라 버전</b>입니다.
+        원문의 한 문장이 이 덱 전체의 S형 선언입니다.
+        "Design is not just styling, it is the collaboration infrastructure behind early alignment."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.11 5-MONTH TIMELINE -->
+<section class="slide annex" data-ch="a" data-title="현장기록 · 5개월 단축">
+  <div class="inner">
+    <div class="paper">
+      <span class="tape"></span>
+      <div class="stamp rv">현장 기록 04 · Field Evidence</div>
+      <div class="src rv" style="--rd:200ms">출처: 선행 기획 단계 As-is / To-be 마일스톤 비교</div>
+      <h2 class="rv" style="--rd:400ms">구조를 바꾸면 달력이 바뀝니다. <b>선행 기획 5개월 단축</b></h2>
+      <p class="alede rv" style="--rd:800ms">상품제안에서 개발착수까지 8개월(M-23 → M-15)이 걸리던 선행 구간이,
+      담당 임명과 <b>워룸 킥오프(M-18)</b>를 앞세운 새 마일스톤에서 3개월(M-21 → M-18 → M-15)로 압축됩니다.
+      도구가 아니라 마일스톤 자체를 다시 그린 결과입니다.</p>
+      <div class="atl rv" style="--rd:1500ms">
+        <div class="atl-row">
+          <span class="lbl">As-is</span>
+          <div class="track">
+            <span class="node2"><span class="m">M-23</span><span class="n">상품제안</span></span>
+            <span class="node2"><span class="m">M-20</span><span class="n">상품제안서</span></span>
+            <span class="node2"><span class="m">M-15</span><span class="n">개발착수</span></span>
+            <span class="node2"><span class="m">M-9</span><span class="n">상품발의</span></span>
+            <span class="node2"><span class="m">M0</span><span class="n">상품기획서</span></span>
+            <span class="node2"><span class="m">M+9</span><span class="n">목표점검 1차</span></span>
+            <span class="node2"><span class="m">M+19</span><span class="n">목표점검 2차</span></span>
+          </div>
+        </div>
+        <div class="atl-row tobe">
+          <span class="lbl">To-be</span>
+          <div class="track">
+            <span class="node2"><span class="m">M-21</span><span class="n">담당 임명</span></span>
+            <span class="node2 won"><span class="m">M-18</span><span class="n">워룸 킥오프</span></span>
+            <span class="node2 won"><span class="m">M-15</span><span class="n">목표 설정</span></span>
+            <span class="node2"><span class="m">M-10</span><span class="n">사업성 승인</span></span>
+            <span class="node2"><span class="m">M0</span><span class="n">개발추진</span></span>
+            <span class="node2"><span class="m">M+11</span><span class="n">마스터카 결정</span></span>
+            <span class="node2"><span class="m">M+19</span><span class="n">양산 · 가격</span></span>
+          </div>
+        </div>
+      </div>
+      <span class="gain rv" style="--rd:2300ms">Δ 선행 기획 단계 5개월 단축</span>
+      <div class="sidenote rv" style="--rd:2900ms">
+        <span class="who">Loonshots 주석</span>
+        이것이 <b>S형 루온샷의 정량 증거</b>입니다. P형(제품 혁신)은 눈에 보이지만,
+        S형(전략 · 구조 혁신)은 달력 위에서만 보입니다. IBM은 PC라는 P형을 마스터하고도 S형에서 무너졌습니다.
+        Payoff가 약속이라면, 이 달력은 측정입니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A.12 PAYOFF -->
+<section class="slide" data-ch="a" data-title="부록 · The Payoff">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">The Payoff · 성과로 착지</div>
+    <h2 class="rv head" style="--rd:250ms">우리가 제안하는 것은 도구가 아니라 <b>성과</b>입니다</h2>
+    <p class="lede rv" style="--rd:1000ms">회사가 <b>더 빠르고, 더 좋고, 더 싸게</b> 자동차를 개발하게 만드는 성과입니다.</p>
+    <div class="payoff">
+      <div class="rv" style="--rd:1700ms"><div class="k">속도</div><div class="d">개발 사이클 단축</div></div>
+      <div class="rv" style="--rd:1830ms"><div class="k">비용</div><div class="d">변경비용의 조기 절감</div></div>
+      <div class="rv" style="--rd:1960ms"><div class="k">품질</div><div class="d">반복 탐색을 통한 품질 상승</div></div>
+      <div class="rv" style="--rd:2090ms"><div class="k">유산</div><div class="d">브랜드 판단의 축적</div></div>
+      <div class="rv" style="--rd:2220ms"><div class="k">주권</div><div class="d">데이터의 내부 축적과 보호</div></div>
+      <div class="rv" style="--rd:2350ms"><div class="k">미래 대응력</div><div class="d">엔진 교체 가능 구조</div></div>
+      <div class="rv" style="--rd:2480ms"><div class="k">CMF</div><div class="d">의사결정의 조기화</div></div>
+      <div class="rv" style="--rd:2610ms"><div class="k">증명</div><div class="d">선언이 아닌 파일럿으로</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- A.13 GO LESSONS (dark) -->
+<section class="slide dark" data-ch="a" data-title="바둑의 교훈">
+  <div class="inner">
+    <span class="twolines"></span>
+    <div class="eyebrow rv">Appendix · 바둑계가 먼저 보여준 교훈</div>
+    <p class="golede rv" style="--rd:250ms">2016년, 알파고가 이세돌을 이겼습니다. 많은 이가 <b>"바둑은 끝났다"</b>고 했습니다.
+    그러나 바둑계는 무너지지 않았습니다. 오히려 진화했습니다.</p>
+    <div class="gotl">
+      <div class="go rv" style="--rd:1100ms">
+        <div class="gy">2016</div>
+        <h4>충격과 선언</h4>
+        <p>알파고의 승리. "인간은 끝났다"는 비관. 패배는 분명한 사실이었습니다.</p>
+      </div>
+      <div class="go rv" style="--rd:1450ms">
+        <div class="gy">2017 →</div>
+        <h4>스승으로 받아들이다</h4>
+        <p>기사들은 AI를 거부하지 않고 <b>연습 상대이자 스승</b>으로 삼았습니다. 인간이 두지 않던 새로운 수를 배웠고, 전체 기력이 올라갔습니다.</p>
+      </div>
+      <div class="go rv" style="--rd:1800ms">
+        <div class="gy">오늘</div>
+        <h4>가장 잘 쓰는 자가 정상에</h4>
+        <p>AI를 거부한 자가 아니라, <b>AI를 가장 잘 '지휘'한 기사</b>가 세계 정상에 섰습니다. 복기와 자기 기보를 가장 깊이 쌓은 사람들입니다.</p>
+      </div>
+    </div>
+    <div class="golessons">
+      <div class="golesson rv" style="--rd:2400ms">
+        <div class="num">교훈 01</div>
+        <p>AI는 인간을 <b>대체</b>한 게 아니라, 인간의 <b>수준을 끌어올렸다.</b></p>
+        <div class="map">→ 디자이너는 연주자에서 <b>지휘자</b>로 (Role)</div>
+      </div>
+      <div class="golesson rv" style="--rd:2650ms">
+        <div class="num">교훈 02</div>
+        <p>승부는 'AI를 쓰느냐'가 아니라 <b>'누가 더 잘 학습하느냐'</b>로 갈렸다.</p>
+        <div class="map">→ 모델이 아니라 <b>학습 루프</b>가 경쟁력 (Risk)</div>
+      </div>
+      <div class="golesson rv" style="--rd:2900ms">
+        <div class="num">교훈 03</div>
+        <p>자신만의 <b>기보(데이터)</b>와 <b>복기(검증)</b>를 쌓은 자가 앞섰다.</p>
+        <div class="map">→ 생성 · 선택 · <b>검증 · 자산화</b>의 Closed Loop (Loop)</div>
+      </div>
+    </div>
+    <p class="lede rv soft" style="--rd:3500ms;margin-top:34px">바둑이 먼저 본 영화입니다. <b>디자인은 같은 결말을, 더 빨리 쓸 수 있습니다.</b></p>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  const deck=document.getElementById('deck');
+  const slides=[...document.querySelectorAll('.slide')];
+  const counter=document.querySelector('#counter b');
+  const total=document.getElementById('total');
+  const bar=document.querySelector('#progress i');
+  const hint=document.getElementById('hint');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  total.textContent=String(slides.length).padStart(2,'0');
+  let cur=0;
+
+  /* ---------- section index (5 sections + appendix) ---------- */
+  const CH=[
+    {ch:'1',n:'01',l:'Why · 왜 지금'},
+    {ch:'2',n:'02',l:'Risk · 진짜 리스크'},
+    {ch:'3',n:'03',l:'Loop · 해결책'},
+    {ch:'4',n:'04',l:'Role · 우리의 역할'},
+    {ch:'5',n:'05',l:'Ask · 실행과 승인'},
+    {ch:'a',n:'A',l:'Appendix · 부록'},
+  ];
+  const nav=document.getElementById('nav');
+  const firstOf={};
+  slides.forEach((s,i)=>{const c=s.dataset.ch; if(firstOf[c]===undefined)firstOf[c]=i;});
+  CH.forEach(c=>{
+    const a=document.createElement('a');
+    a.dataset.ch=c.ch;
+    a.innerHTML='<span class="dot"></span><span class="nx">'+c.n+'</span><span class="nl">'+c.l+'</span>';
+    a.addEventListener('click',()=>{if(firstOf[c.ch]!==undefined)go(firstOf[c.ch]);});
+    nav.appendChild(a);
+  });
+  const navItems=[...nav.querySelectorAll('a')];
+  function setNav(ch){navItems.forEach(a=>a.classList.toggle('active',a.dataset.ch===String(ch)));}
+
+  /* ---------- count-up ---------- */
+  function startCounts(slide){
+    slide.querySelectorAll('[data-count]').forEach(el=>{
+      if(el.dataset.running)return;
+      el.dataset.running='1';
+      const target=parseFloat(el.dataset.count);
+      const dur=parseInt(el.dataset.dur||'1500',10);
+      const sfxEl=el.querySelector('i');
+      const sfx=sfxEl?sfxEl.outerHTML:'';
+      const dec=String(el.dataset.count).includes('.')?1:0;
+      const wrap=el.closest('.rv');
+      const delay=wrap?parseInt((wrap.style.getPropertyValue('--rd')||'0'),10):0;
+      if(reduced){el.innerHTML=target.toFixed(dec)+sfx;return}
+      el._t=setTimeout(()=>{
+        const t0=performance.now();
+        (function tick(t){
+          const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+          el.innerHTML=(target*e).toFixed(dec)+sfx;
+          if(p<1)el._raf=requestAnimationFrame(tick);
+        })(t0);
+      },delay+150);
+    });
+  }
+  function resetCounts(slide){
+    slide.querySelectorAll('[data-count]').forEach(el=>{
+      clearTimeout(el._t);cancelAnimationFrame(el._raf);
+      delete el.dataset.running;
+      const sfxEl=el.querySelector('i');
+      el.innerHTML='0'+(sfxEl?sfxEl.outerHTML:'');
+    });
+  }
+
+  /* ---------- slide observer ---------- */
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.intersectionRatio>=.5){
+        e.target.classList.add('on');
+        startCounts(e.target);
+        cur=slides.indexOf(e.target);
+        counter.textContent=String(cur+1).padStart(2,'0');
+        const isDark=e.target.classList.contains('dark');
+        document.body.classList.toggle('on-dark',isDark);
+        bar.style.width=((cur+1)/slides.length*100)+'%';
+        setNav(e.target.dataset.ch);
+        if(cur>0)hint.style.opacity=0; else hint.style.opacity='';
+      }else if(e.intersectionRatio<=.05 && e.target.classList.contains('on')){
+        e.target.classList.remove('on');
+        resetCounts(e.target);
+      }
+    });
+  },{root:deck,threshold:[0.05,0.5]});
+  slides.forEach(s=>io.observe(s));
+
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i));
+    slides[i].scrollIntoView({behavior:'smooth'});
+  }
+  addEventListener('keydown',e=>{
+    if(['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}
+    else if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1)}
+    else if(e.key==='Home'){e.preventDefault();go(0)}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+  });
+
+  /* ---------- clickable progress bar ---------- */
+  const prog=document.getElementById('progress');
+  prog.addEventListener('click',e=>{
+    const p=e.clientX/window.innerWidth;
+    go(Math.round(p*(slides.length-1)));
+  });
+
+  /* ---------- value chain reversal (appendix, secondary) ---------- */
+  const btn=document.getElementById('flipBtn');
+  const chain2=document.getElementById('chain2');
+  const note=document.getElementById('flipNote');
+  if(btn){
+    btn.addEventListener('click',()=>{
+      const r=chain2.classList.toggle('reversed');
+      btn.setAttribute('aria-pressed',r);
+      btn.textContent=r?'다시 단방향으로':'방향을 뒤집다';
+      note.classList.toggle('lit',r);
+      note.textContent=r
+        ?'소비자 신호가 설계의 입력값이 됩니다. 그 시작점이 디자인입니다.'
+        :'단방향을 완성한 혁명에서, 단방향을 뒤집는 혁명으로.';
+    });
+  }
+
+  /* ---------- flip cards ---------- */
+  document.querySelectorAll('.fcard').forEach(c=>{
+    const toggle=()=>{c.classList.toggle('flip');c.setAttribute('aria-pressed',c.classList.contains('flip'))};
+    c.addEventListener('click',toggle);
+    c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+  });
+
+  /* ---------- risk open/closed toggle ---------- */
+  const rOpen=document.getElementById('riskOpen');
+  const rClosed=document.getElementById('riskClosed');
+  const rDia=document.getElementById('riskDia');
+  const rRead=document.getElementById('riskRead');
+  const rTop=document.getElementById('riskTop');
+  const rBot=document.getElementById('riskBot');
+  if(rOpen){
+    const setOpen=()=>{
+      rDia.classList.remove('closed');
+      rOpen.classList.add('on','danger');rOpen.setAttribute('aria-pressed','true');
+      rClosed.classList.remove('on');rClosed.setAttribute('aria-pressed','false');
+      rTop.textContent='전문성이 빠져나감';
+      rBot.textContent='→ 외부 모델의 학습 재료';
+      rRead.className='riskread danger';
+      rRead.innerHTML='상용 AI를 그냥 쓰면 우리의 판단 체계가 <b>외부 플랫폼의 가치로 흡수</b>됩니다. 브랜드의 취향과 디자이너의 안목이 우리의 경쟁력이 아니라, 모델 회사의 자산으로 쌓입니다.';
+    };
+    const setClosed=()=>{
+      rDia.classList.add('closed');
+      rClosed.classList.add('on');rClosed.setAttribute('aria-pressed','true');
+      rOpen.classList.remove('on','danger');rOpen.setAttribute('aria-pressed','false');
+      rTop.textContent='학습이 안으로 순환';
+      rBot.textContent='← 엔진은 빌리되, 노하우는 축적';
+      rRead.className='riskread safe';
+      rRead.innerHTML='Closed Loop에서는 엔진을 빌려 쓰되, 판단과 노하우가 <b>우리 안에 자산으로 축적</b>됩니다. 모델은 교체해도 베테랑은 사라지지 않습니다. 이것이 이 시대의 진짜 주권입니다.';
+    };
+    rOpen.addEventListener('click',setOpen);
+    rClosed.addEventListener('click',setClosed);
+  }
+
+  /* ---------- closed loop centerpiece ---------- */
+  const STAGES=[
+    {g:'STAGE 01 · GENERATE',lead:'더 많은 가능성을 만든다.',t:'생성 — AI가 더 이른 시점에, 더 많은 옵션을',
+     d:'AI는 탐색과 압축의 엔진입니다. 콘크리트를 붓기 전에 수백 개의 방향을 빠르게 펼칩니다. 디자이너는 손이 아니라 <b>의도로 탐색의 폭</b>을 엽니다.',
+     a:'자산 · <b>Key Image · Line-up Overview (AI Design Agent)</b>'},
+    {g:'STAGE 02 · SELECT',lead:'디자이너가 방향을 고른다.',t:'선택 — 지휘자의 판단이 방향을 정한다',
+     d:'방대한 선택지를 <b>브랜드 의도로 필터링</b>합니다. 핵심은 만드는 것이 아니라 고르는 것. 음악을 모르는 사람은 지휘할 수 없습니다.',
+     a:'자산 · <b>Intent Package · 선택의 근거 기록</b>'},
+    {g:'STAGE 03 · VALIDATE',lead:'시장·품평·실차·데이터로 검증한다.',t:'검증 — 가장 이른 단계에서 함께 합의한다',
+     d:'크로스티켓과 워룸에서 엔지니어링·구매·품질의 제약이 <b>초기 탐색의 입력값</b>으로 들어옵니다. 디지털 품평으로 물리 시편을 기다리지 않습니다.',
+     a:'자산 · <b>War Room 합의 · 디지털 품평 데이터</b>'},
+    {g:'STAGE 04 · ASSETIZE',lead:'판단과 결과를 브랜드 자산으로 남긴다.',t:'자산화 — 판단이 사멸하지 않고 축적된다',
+     d:'머릿속에 갇혀 사라지던 판단이 <b>기록되어 브랜드 판단 체계</b>로 쌓입니다. 그리고 이 자산이 다음 ‘생성’을 더 좋게 만듭니다.',
+     a:'자산 · <b>Action Log · 브랜드 판단 체계 학습</b>'},
+  ];
+  const nodes=[...document.querySelectorAll('.loopnode')];
+  const lpG=document.getElementById('lpGloss');
+  const lpL=document.getElementById('lpLead');
+  const lpT=document.getElementById('lpTitle');
+  const lpD=document.getElementById('lpDesc');
+  const lpA=document.getElementById('lpAsset');
+  const prog2=document.getElementById('loopProg');
+  const countEl=document.getElementById('loopCount');
+  const runBtn=document.getElementById('loopRun');
+  let laps=0, running=false;
+  if(prog2){
+    const C=2*Math.PI*120;
+    prog2.style.setProperty('--circ',C);
+    function showStage(i){
+      const s=STAGES[i];
+      lpG.textContent=s.g; lpL.textContent=s.lead; lpT.textContent=s.t; lpD.innerHTML=s.d; lpA.innerHTML=s.a;
+      nodes.forEach(n=>n.classList.toggle('active',+n.dataset.stage===i));
+      prog2.style.strokeDashoffset=C*(1-(i+1)/4);
+    }
+    nodes.forEach(n=>n.addEventListener('click',()=>{if(!running)showStage(+n.dataset.stage);}));
+    runBtn.addEventListener('click',()=>{
+      if(running)return; running=true; runBtn.textContent='도는 중…';
+      let i=0;
+      showStage(0);
+      const iv=setInterval(()=>{
+        i++;
+        if(i<4){showStage(i);}
+        else{
+          clearInterval(iv);
+          laps++; countEl.textContent=laps;
+          prog2.style.strokeDashoffset=C;
+          running=false; runBtn.textContent='한 바퀴 더 돌리기';
+          setTimeout(()=>showStage(0),200);
+        }
+      },820);
+    });
+  }
+})();
+</script>
+</body>
+</html>
