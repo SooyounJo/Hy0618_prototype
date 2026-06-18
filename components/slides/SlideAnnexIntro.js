@@ -8,7 +8,7 @@ export default function SlideAnnexIntro() {
           speed={4}
           scale={0.45}
           color="#B5BECF"
-          color2="#FFFFFF"
+          color2="#E0E7EF"
           noiseIntensity={1.2}
           rotation={0.1}
         />

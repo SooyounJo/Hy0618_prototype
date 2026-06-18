@@ -1723,7 +1723,7 @@
 
 /* ---------- annex intro (page 17) ---------- */
 .figma-annex-intro {
-  background: #f5f6fa;
+  background: #E0E7EF;
 }
 
 .figma-annex-intro__bg {
@@ -1732,18 +1732,18 @@
   background:
     radial-gradient(
       80% 70% at 50% 0%,
-      rgba(210, 214, 224, 0.6) 0%,
-      rgba(235, 238, 245, 0.85) 18%,
-      rgba(255, 255, 255, 0.98) 72%
+      rgba(181, 190, 207, 0.6) 0%,
+      rgba(210, 217, 230, 0.85) 18%,
+      rgba(224, 231, 239, 0.98) 72%
     ),
-    linear-gradient(180deg, #f7f8fa 0%, #f1f2f6 100%);
+    linear-gradient(180deg, #E0E7EF 0%, #D1D9E6 100%);
   opacity: 1;
   overflow: hidden;
 }
 
 .figma-annex-intro__bg canvas {
-  mix-blend-mode: soft-light;
-  opacity: 0.7;
+  mix-blend-mode: multiply;
+  opacity: 0.6;
 }
 
 .figma-annex-intro__content {
